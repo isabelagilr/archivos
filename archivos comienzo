@@ -1,0 +1,121 @@
+// archivosss.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "stdlib.h"
+#include "conio.h"
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+void add();
+void add_directo();
+void list();
+void consulta();
+void borrar_logico();
+void borrar_fisico();
+void modif();
+void modif_directo();
+
+struct prod{
+	int codigo;
+	string descrip;
+	int cantidad;
+	float precio;
+	string garantia;
+	string estado;
+};
+
+
+void main()
+{
+int op;
+	do{
+	cout<<"         MENU"<<endl;
+
+	cout<<"(1) adicion"<<endl;
+	cout<<"(2) adicion directa"<<endl;
+	cout<<"(3) listado"<<endl;
+	cout<<"(4) consulta o listado directo"<<endl;
+	cout<<"(5) modificado"<<endl;
+	cout<<"(6) modificado directo"<<endl;
+	cout<<"(7) borrado logico"<<endl;
+	cout<<"(8) borrado fisico"<<endl;
+	cout<<"(0) SALIR"<<endl;
+	cout<<endl;
+	cout<<"ingrese una opcion"<<endl;
+	cin>>op;
+	switch(op)
+	{
+	case 1:
+		{
+		add();
+		break;
+		}
+	case 2:
+		{
+		add_directo();
+		break;
+		}
+
+	case 3:
+		{
+		list();
+		break;
+		}
+	case 4:
+		{
+		consulta();
+		break;
+		}
+	case 5:
+		{
+		modif();
+		break;
+		}
+	case 6:
+		{
+		modif_directo();
+		break;
+		}
+	case 7:
+		{
+		borrar_logico();
+		break;
+		}
+	case 8:
+		{
+		borrar_fisico();
+		break;
+		}
+	case 0:
+		{
+		cout<<"salir"<<endl;
+		break;
+		}
+	default:
+		{
+		cout<<"error"<<endl;
+		break;
+		}
+	}
+	}while(op!=0);
+	getch();
+}
+
+void add()
+{
+	FILE *ptr;
+	prod reg;
+	ptr=fopen("producto.dat","ab");
+
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else 
+		cout<<"ingrese el codigo del producto"<<endl;
+	cin>>prod.codigo;
+	cout<<"ingrese la descripcion del producto"<<endl;
+	getline(cin,prod.descript);
+
+}
