@@ -17,6 +17,7 @@ void borrar_logico();
 void borrar_fisico();
 void modif();
 void modif_directo();
+int encontrarpos(int cod);
 
 struct prod{
 	int codigo;
@@ -26,7 +27,8 @@ struct prod{
 	string garantia;
 	string estado;
 };
-
+	prod reg;
+	FILE *ptr;
 
 void main()
 {
@@ -66,27 +68,27 @@ int op;
 		}
 	case 4:
 		{
-		consulta();
+		
 		break;
 		}
 	case 5:
 		{
-		modif();
+
 		break;
 		}
 	case 6:
 		{
-		modif_directo();
+	
 		break;
 		}
 	case 7:
 		{
-		borrar_logico();
+	
 		break;
 		}
 	case 8:
 		{
-		borrar_fisico();
+		
 		break;
 		}
 	case 0:
@@ -106,16 +108,108 @@ int op;
 
 void add()
 {
-	FILE *ptr;
-	prod reg;
 	ptr=fopen("producto.dat","ab");
 
 	if(ptr==NULL)
 		cout<<"no existe el archivo"<<endl;
 	else 
-		cout<<"ingrese el codigo del producto"<<endl;
-	cin>>prod.codigo;
+	{
+	cin.ignore();
+	cout<<"ingrese el codigo del producto"<<endl;
+	cin>>reg.codigo;
+	cin.ignore();
 	cout<<"ingrese la descripcion del producto"<<endl;
-	getline(cin,prod.descript);
+	getline(cin,reg.descrip);
+	cout<<"ingrese la cantidad"<<endl;
+	cin>>reg.cantidad;
+	cout<<"ingrese precio"<<endl;
+	cin>>reg.precio;
+	cin.ignore();
+	cout<<"ingrese S si tiene garantia, N si no tiene garantia"<<endl;
+	getline(cin,reg.garantia);
+	
 
+	fwrite(&reg,sizeof(reg),1,ptr);
+	fclose(ptr);
+
+	cout<<"producto registrado"<<endl;
+	cout<<"oprima cualquier tecla para continuar"<<endl;
+	getch();
+
+	}
+
+}
+void add_directo()
+{
+	int cod,pos;
+	cout<<"que codigo desea"<<endl;
+	cin>>cod;
+	ptr=fopen("producto.dat","wb");
+
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else 
+	{
+	pos=encontrarpos(cod);
+	fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+	cin.ignore();
+	cout<<"ingrese el codigo del producto"<<endl;
+	cin>>reg.codigo;
+	cout<<"ingrese la descripcion del producto"<<endl;
+	getline(cin,reg.descrip);
+	cout<<"ingrese la cantidad"<<endl;
+	cin>>reg.cantidad;
+	cout<<"ingrese precio"<<endl;
+	cin>>reg.precio;
+	cout<<"ingrese S si tiene garantia, N si no tiene garantia"<<endl;
+	getline(cin,reg.garantia);
+	fwrite(&reg,sizeof(reg),1,ptr);
+	fclose(ptr);
+
+	cout<<"producto registrado"<<endl;
+	cout<<"oprima cualquier tecla para continuar"<<endl;
+	getch();
+
+	}
+
+}
+
+int encontrarpos(int cod)
+{
+	int cont=0;
+	ptr=fopen("productos.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else 
+	{
+		cont++;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)&&cod!=reg.codigo)
+		{
+		fread(&reg,sizeof(reg),1,ptr);
+		cont++;
+		}
+	}
+	return(cont);
+}
+
+void list()
+{
+	FILE *ptr;
+	prod reg;
+	ptr=fopen("producto.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else 
+	{
+	cout<< cout<< "\n\rNo Prod       Descripcion      Cantidad       Precio         Garantia"<<endl; 
+	cout << "\n\r---------------------------------------------------------------------------"<<endl;
+	fread(&reg,sizeof(reg),1,ptr);
+	while(!feof(ptr))
+	{
+	cout<<reg.codigo<<"\t""\t"<<reg.descrip<<"\t""\t"<<reg.cantidad<<"\t""\t"<<reg.precio<<"\t""\t"<<reg.garantia<<endl; 
+	fread(&reg,sizeof(reg),1,ptr);
+	}
+	fclose(ptr);
+	}
 }
