@@ -1,4 +1,4 @@
-// archivosss.cpp : Defines the entry point for the console application.
+// archi.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -9,14 +9,14 @@
 
 using namespace std;
 
-void add();
-void add_directo();
-void list();
-void consulta();
-void borrar_logico();
-void borrar_fisico();
-void modif();
-void modif_directo();
+void add(void);
+void add_directo(void);
+void list(void);
+void consulta(void);
+void borrar_logico(void);
+void borrar_fisico(void);
+void modif(void);
+void modif_directo(void);
 int encontrarpos(int cod);
 
 struct prod{
@@ -24,8 +24,8 @@ struct prod{
 	string descrip;
 	int cantidad;
 	float precio;
-	string garantia;
-	string estado;
+	char garantia;
+	char estado;
 };
 	prod reg;
 	FILE *ptr;
@@ -57,7 +57,7 @@ int op;
 		}
 	case 2:
 		{
-		add_directo();
+	
 		break;
 		}
 
@@ -106,7 +106,7 @@ int op;
 	getch();
 }
 
-void add()
+void add(void)
 {
 	ptr=fopen("producto.dat","ab");
 
@@ -125,49 +125,17 @@ void add()
 	cout<<"ingrese precio"<<endl;
 	cin>>reg.precio;
 	cin.ignore();
+	do{
 	cout<<"ingrese S si tiene garantia, N si no tiene garantia"<<endl;
-	getline(cin,reg.garantia);
-	
-
+	reg.garantia=toupper(getche()); 
+	}while((reg.garantia!='S')&&(reg.garantia!='N'));
+	reg.estado='S';
 	fwrite(&reg,sizeof(reg),1,ptr);
 	fclose(ptr);
 
 	cout<<"producto registrado"<<endl;
 	cout<<"oprima cualquier tecla para continuar"<<endl;
-	getch();
-
-	}
-
-}
-void add_directo()
-{
-	int cod,pos;
-	cout<<"que codigo desea"<<endl;
-	cin>>cod;
-	ptr=fopen("producto.dat","wb");
-
-	if(ptr==NULL)
-		cout<<"no existe el archivo"<<endl;
-	else 
-	{
-	pos=encontrarpos(cod);
-	fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
-	cin.ignore();
-	cout<<"ingrese el codigo del producto"<<endl;
-	cin>>reg.codigo;
-	cout<<"ingrese la descripcion del producto"<<endl;
-	getline(cin,reg.descrip);
-	cout<<"ingrese la cantidad"<<endl;
-	cin>>reg.cantidad;
-	cout<<"ingrese precio"<<endl;
-	cin>>reg.precio;
-	cout<<"ingrese S si tiene garantia, N si no tiene garantia"<<endl;
-	getline(cin,reg.garantia);
-	fwrite(&reg,sizeof(reg),1,ptr);
-	fclose(ptr);
-
-	cout<<"producto registrado"<<endl;
-	cout<<"oprima cualquier tecla para continuar"<<endl;
+	return;
 	getch();
 
 	}
@@ -193,23 +161,29 @@ int encontrarpos(int cod)
 	return(cont);
 }
 
-void list()
+void list(void)
 {
-	FILE *ptr;
-	prod reg;
 	ptr=fopen("producto.dat","rb");
 	if(ptr==NULL)
+	{	
 		cout<<"no existe el archivo"<<endl;
-	else 
-	{
-	cout<< cout<< "\n\rNo Prod       Descripcion      Cantidad       Precio         Garantia"<<endl; 
-	cout << "\n\r---------------------------------------------------------------------------"<<endl;
+		getch();
+		return;
+	}
+	
+	cout<< cout<< "\n\rNo Prod       Descripcion      Cantidad       Precio         Garantia       estado"<<endl; 
+	cout << "\n\r----------------------------------------------------------------------------------------"<<endl;
 	fread(&reg,sizeof(reg),1,ptr);
 	while(!feof(ptr))
 	{
-	cout<<reg.codigo<<"\t""\t"<<reg.descrip<<"\t""\t"<<reg.cantidad<<"\t""\t"<<reg.precio<<"\t""\t"<<reg.garantia<<endl; 
+	cout<<reg.codigo<<"\t""\t"<<reg.descrip<<"\t""\t"<<reg.cantidad<<"\t""\t"<<reg.precio<<"\t""\t"<<reg.garantia<<"\t""\t"<<reg.estado<<endl; 
 	fread(&reg,sizeof(reg),1,ptr);
 	}
 	fclose(ptr);
-	}
+	
+	getch();
+	return;
 }
+
+
+
