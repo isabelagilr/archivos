@@ -1,0 +1,173 @@
+// ayssss.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "stdlib.h"
+#include <string>
+#include <iostream>
+#include "conio.h"
+
+using namespace std;
+
+void adicionaramigos(void);
+void mostraramigos(void);
+void modificaramigos(void);
+int obtenerpos(int cod);
+
+struct amigos{
+	int codigo;
+	string nombre;
+	int edad;
+};
+
+void main()
+{
+	int op;
+	do{
+	cout<<"         MENU"<<endl;
+	cout<<"(1) adicion"<<endl;
+	cout<<"(2) listado"<<endl;
+	cout<<"(3) modificar"<<endl;
+	cout<<"(0) SALIR"<<endl;
+	cout<<endl;
+	cout<<"ingrese una opcion"<<endl;
+	cin>>op;
+	switch(op)
+	{
+	case 1:
+		{
+		adicionaramigos();
+		break;
+		}
+	case 2:
+		{
+		mostraramigos();
+		break;
+		}
+	case 3:
+		{
+		modificaramigos();
+		break;
+		}
+	case 0:
+		{
+		cout<<"salir"<<endl;
+		break;
+		}
+	default:
+		{
+		cout<<"error"<<endl;
+		break;
+		}
+	}
+	}while(op!=0);
+	getch();
+}
+
+void adicionaramigos(void)
+{
+	FILE *ptr;
+	amigos reg;
+	ptr=fopen("amigos.dat","ab");
+	if(ptr==NULL)
+	{
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+		getch();
+		return;
+	}	
+	cout<<"CODIGO:";
+	cin>>reg.codigo;
+	cin.ignore();
+	cout<<"NOMBRE:";
+	getline(cin,reg.nombre);
+	cout<<"EDAD:";
+	cin>>reg.edad;
+	fwrite(&reg,sizeof(reg),1,ptr);
+	
+	fclose(ptr);
+	cout<<"oprima cualquier tecla para seguir"<<endl;
+	getch();
+	return();
+}
+
+void mostraramigos(void)
+{
+	FILE *ptr;
+	amigos reg;
+	ptr=fopen("amigos.dat","rb");
+	if(ptr==NULL)
+	{
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+		getch();
+		return;
+	}
+	fread(&reg,sizeof(reg),1,ptr);
+	cout<<"CODIGO         NOMBRE          EDAD "<<endl;
+	cout<<"------------------------------------"<<endl;
+	while(feof(ptr)==false)
+	{
+		cout<<reg.codigo<<"\t""\t"<<reg.nombre<<"\t""\t"<<reg.edad<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+	}
+	fclose(ptr);
+	cout<<"------------------------------------"<<endl;
+	cout<<"oprima cualquier tecla para seguir"<<endl;
+	getch();
+	return;
+}
+
+
+void modificaramigos(void)
+{
+	FILE *ptr;
+	amigos reg;
+	int pos;
+	int cod;
+	cout<<"ingrese el CODIGO del amigo que desea modificar:";
+	cin>>cod;
+	ptr=fopen("amigos.dat","r+b"); // AQUI ES DONDE TENGO ERROR
+	if(ptr==NULL)
+	{
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+		getch();
+		return;
+	}
+	pos=obtenerpos(cod);
+	cout<<pos;
+	fseek(ptr,((pos-1)*sizeof(reg)),SEEK_SET);
+	fread(&reg,sizeof(reg),1,ptr);
+	cin.ignore();
+	cout<<"NOMBRE:";
+	getline(cin,reg.nombre);
+	cout<<"EDAD:";
+	cin>>reg.edad;
+	fwrite(&reg,sizeof(reg),1,ptr);
+	fclose(ptr);
+	cout<<"oprima cualquier tecla para seguir"<<endl;
+	getch();
+	return;
+}
+
+int obtenerpos(int cod)
+{
+	int cont=0;
+	FILE *ptr;
+	amigos reg;
+	ptr=fopen("amigos.dat","rb");
+	if(ptr==NULL)
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+	else
+	{
+		cont++;
+		fread(&reg,sizeof(reg),1,ptr);
+		while((feof(ptr)==false)&&(cod!=reg.codigo))
+		{
+			fread(&reg,sizeof(reg),1,ptr);
+			cont++;
+		}
+	}
+
+	fclose(ptr);
+	return(cont);
+}
+
