@@ -1,0 +1,169 @@
+// sin string.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "stdlib.h"
+#include <string>
+#include <iostream>
+#include "conio.h"
+
+using namespace std;
+
+int obtenerpos(int cod);
+void adicionaramigos();
+void mostraramigos();
+void modificaramigos();
+
+struct amigos{
+	int codigo;
+	int numero;
+	int edad;
+};
+
+void main()
+{
+	int op;
+	do{
+	cout<<"         MENU"<<endl;
+	cout<<"(1) adicion"<<endl;
+	cout<<"(2) listado"<<endl;
+	cout<<"(3) modificar"<<endl;
+	cout<<"(0) SALIR"<<endl;
+	cout<<endl;
+	cout<<"ingrese una opcion"<<endl;
+	cin>>op;
+	switch(op)
+	{
+	case 1:
+		{
+		adicionaramigos();
+		break;
+		}
+	case 2:
+		{
+		mostraramigos();
+		break;
+		}
+	case 3:
+		{
+		modificaramigos();
+		break;
+		}
+	case 0:
+		{
+		cout<<"salir"<<endl;
+		break;
+		}
+	default:
+		{
+		cout<<"error"<<endl;
+		break;
+		}
+	}
+	}while(op!=0);
+	getch();
+}
+
+void adicionaramigos()
+{
+	FILE *ptr;
+	amigos reg;
+	ptr=fopen("amigos.dat","ab");
+	if(ptr==NULL)
+	{
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+	}
+	else
+	{
+	cout<<"CODIGO:";
+	cin>>reg.codigo;
+	cout<<"Numero:";
+	cin>>reg.numero;
+	cout<<"EDAD:";
+	cin>>reg.edad;
+	
+	fwrite(&reg,sizeof(reg),1,ptr);
+	fclose(ptr);
+	}
+}
+
+void mostraramigos(void)
+{
+	FILE *ptr;
+	amigos reg;
+	ptr=fopen("amigos.dat","rb");
+	if(ptr==NULL)
+	{
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+	}
+	else 
+	{
+	fread(&reg,sizeof(reg),1,ptr);
+	cout<<"CODIGO         NUMERO          EDAD "<<endl;
+	cout<<"------------------------------------"<<endl;
+	while(feof(ptr)==false)
+	{
+		cout<<reg.codigo<<"\t""\t"<<reg.numero<<"\t""\t"<<reg.edad<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+	}
+
+	cout<<"------------------------------------"<<endl;
+	fclose(ptr);
+	}
+	
+}
+
+
+void modificaramigos()
+{
+	FILE *ptr;
+	amigos reg;
+	int pos, cod;
+	cout<<"ingrese el CODIGO del amigo que desea modificar:";
+	cin>>cod;
+	pos=obtenerpos(cod);
+	cout<<pos;
+	ptr=fopen("amigos.dat","r+b");
+	if(ptr!=NULL)
+	{
+		fseek(ptr,((pos-1)*sizeof(reg)),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr))
+			{
+			reg.codigo=cod;
+			cout<<"Numero:";
+			cin>>reg.numero;
+			cout<<"EDAD:";
+			cin>>reg.edad;
+			fseek(ptr,((pos-1)*sizeof(reg)),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+			}
+	}
+	fclose(ptr);
+}
+
+int obtenerpos(int cod)
+{	
+	amigos reg;
+	FILE *ptr;
+	int cont=0,pos;
+	ptr=fopen("amigos.dat","rb");
+	if(ptr==NULL)
+		cout<<"NO EXISTE EL ARCHIVO"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while((feof(ptr)==false))
+		{	cont++;
+			if(reg.codigo==cod)
+			{
+				pos=cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+
+
