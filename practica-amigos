@@ -1,4 +1,4 @@
-// ayssss.cpp : Defines the entry point for the console application.
+// lalalalalalalalalalalalallalal.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -9,10 +9,10 @@
 
 using namespace std;
 
-void adicionaramigos(void);
-void mostraramigos(void);
-void modificaramigos(void);
 int obtenerpos(int cod);
+void adicionaramigos();
+void mostraramigos();
+void modificaramigos();
 
 struct amigos{
 	int codigo;
@@ -64,7 +64,7 @@ void main()
 	getch();
 }
 
-void adicionaramigos(void)
+void adicionaramigos()
 {
 	FILE *ptr;
 	amigos reg;
@@ -83,11 +83,7 @@ void adicionaramigos(void)
 	cout<<"EDAD:";
 	cin>>reg.edad;
 	fwrite(&reg,sizeof(reg),1,ptr);
-	
 	fclose(ptr);
-	cout<<"oprima cualquier tecla para seguir"<<endl;
-	getch();
-	return();
 }
 
 void mostraramigos(void)
@@ -109,57 +105,55 @@ void mostraramigos(void)
 		cout<<reg.codigo<<"\t""\t"<<reg.nombre<<"\t""\t"<<reg.edad<<endl;
 		fread(&reg,sizeof(reg),1,ptr);
 	}
-	fclose(ptr);
+
 	cout<<"------------------------------------"<<endl;
-	cout<<"oprima cualquier tecla para seguir"<<endl;
+	fclose(ptr);
 	getch();
-	return;
 }
 
 
-void modificaramigos(void)
+void modificaramigos()
 {
 	FILE *ptr;
 	amigos reg;
-	int pos;
-	int cod;
+	int pos, cod;
 	cout<<"ingrese el CODIGO del amigo que desea modificar:";
 	cin>>cod;
+	pos=obtenerpos(cod);
 	ptr=fopen("amigos.dat","r+b"); // AQUI ES DONDE TENGO ERROR
 	if(ptr==NULL)
 	{
 		cout<<"NO EXISTE EL ARCHIVO"<<endl;
 		getch();
-		return;
 	}
-	pos=obtenerpos(cod);
-	cout<<pos;
 	fseek(ptr,((pos-1)*sizeof(reg)),SEEK_SET);
 	fread(&reg,sizeof(reg),1,ptr);
 	cin.ignore();
-	cout<<"NOMBRE:";
-	getline(cin,reg.nombre);
-	cout<<"EDAD:";
-	cin>>reg.edad;
-	fseek(ptr,((pos-1)*sizeof(reg)),SEEK_SET);
-	fwrite(&reg,sizeof(reg),1,ptr);
+	if(!feof(ptr))
+	{
+		reg.codigo=cod;
+		cout<<"NOMBRE:";
+		getline(cin,reg.nombre);
+		cout<<"EDAD:";
+		cin>>reg.edad;
+		fseek(ptr,((pos-1)*sizeof(reg)),SEEK_SET);
+		fwrite(&reg,sizeof(reg),1,ptr);
+	}
 	fclose(ptr);
 	cout<<"oprima cualquier tecla para seguir"<<endl;
 	getch();
-	return;
 }
 
 int obtenerpos(int cod)
 {
-	int cont=0;
 	FILE *ptr;
 	amigos reg;
+	int cont=0;
 	ptr=fopen("amigos.dat","rb");
 	if(ptr==NULL)
 		cout<<"NO EXISTE EL ARCHIVO"<<endl;
 	else
 	{
-		cont++;
 		fread(&reg,sizeof(reg),1,ptr);
 		while((feof(ptr)==false)&&(cod!=reg.codigo))
 		{
@@ -171,4 +165,3 @@ int obtenerpos(int cod)
 	fclose(ptr);
 	return(cont);
 }
-
