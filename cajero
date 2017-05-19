@@ -1,0 +1,2170 @@
+#include <iostream>
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <iomanip>
+#define N 40
+using namespace std;
+using namespace System;
+struct Cliente{
+	int idCliente;
+	char nombreCliente[N];
+	char telefono[N];
+	char email[N];
+	char direccion[N];
+	char estado;
+};
+struct Cuenta{
+	int idCuenta;
+	char numero[N];
+	char tipoMoneda;
+	float saldo;
+	int idCliente;
+	char estado;
+};
+struct Sucursal{
+	int idSucursal;
+	char nombre[N];
+	char direccion[N];
+	char telefono[N];
+	char estado;
+};
+struct Cajeros{
+	int idCajero;
+	char nombre[N];
+	char email[N];
+	char telefono[N];
+	int idSucursal;
+	char estado;
+};
+struct Transaccion{
+	int idTransaccion;
+	char fecha[N];
+	char tipoTransaccion;
+	float monto;
+	int idCuenta;
+	int idCajero;
+	char estado;
+};
+// Verificar Existencia
+bool verificaridClientes(int id){
+    FILE*ptr;
+    Cliente reg;
+    bool k = false;
+    ptr = fopen("Clientes.dat","rb");
+    if(ptr != NULL){
+        fread(&reg,sizeof(reg),1,ptr);
+        while(!feof(ptr)){
+            if(id == reg.idCliente && reg.estado == 'N'){
+                k = true;
+            }
+            fread(&reg,sizeof(reg),1,ptr);
+        }
+        fclose(ptr);
+    }else{
+		cout << endl << "Archivo no existe...";
+	}
+	return(k);
+}
+bool verificaridCuenta(int id){
+    FILE*ptr;
+    Cuenta reg;
+    bool k = false;
+    ptr = fopen("Cuentas.dat","rb");
+    if(ptr != NULL){
+        fread(&reg,sizeof(reg),1,ptr);
+        while(!feof(ptr)){
+            if(id == reg.idCuenta && reg.estado == 'N'){
+                k = true;
+            }
+            fread(&reg,sizeof(reg),1,ptr);
+        }
+        fclose(ptr);
+    }else{
+        cout << endl << "Archivo no existe...";
+    }
+    return(k);
+}
+bool verificaridSucursal(int id){
+    FILE*ptr;
+    Sucursal reg;
+    bool k = false;
+    ptr = fopen("Sucursal.dat","rb");
+    if(ptr != NULL){
+        fread(&reg,sizeof(reg),1,ptr);
+        while(!feof(ptr)){
+            if(id == reg.idSucursal && reg.estado == 'N'){
+                k = true;
+            }
+            fread(&reg,sizeof(reg),1,ptr);
+        }
+		fclose(ptr);
+    }else{
+        cout << endl << "Archivo no Existe...";
+    }
+    return(k);
+}
+bool verificaridCajero(int id){
+    FILE *ptr;
+    Cajeros reg;
+    bool k = false;
+    ptr = fopen("Cajeros.dat","rb");
+    if(ptr != NULL){
+        fread(&reg,sizeof(reg),1,ptr);
+        while(!feof(ptr)){
+            if(id == reg.idCajero && reg.estado == 'N'){
+                k = true;
+            }
+            fread(&reg,sizeof(reg),1,ptr);
+        }
+        fclose(ptr);
+    }else{
+        cout << endl << "Archino no existe...";
+    }
+    return(k);
+}
+bool verificaridTransaccion(int id){
+    FILE*ptr;
+    Transaccion reg;
+    bool k = false;
+    ptr = fopen("Transaccion.dat","rb");
+    if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(id == reg.idTransaccion && reg.estado == 'N'){
+				k = true;
+            }
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+    }else{
+        cout << endl << "Archivo no Existe...";
+    }
+    return(k);
+}
+bool verificacionDeSaldo(float x, int id){
+	bool k = true;
+	FILE *ptr;
+	Cuenta reg;
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idCuenta == id && reg.estado == 'N'){
+				if(reg.saldo < x){
+					k = false;
+				}
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "Archivo no existe...";
+	}
+	return(k);
+}
+//Verificar eliminacion
+bool verificarClienteEnCuenta(int id){
+	FILE *ptr;
+	Cuenta reg;
+	bool k = false;
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idCliente == id){
+				k = true;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "Error, no existe el archivo";
+	}
+	return (k);
+}
+bool verificarCuentaEnTransaccion(int id){
+	FILE *ptr;
+	Transaccion reg;
+	bool k = false;
+	ptr = fopen("Transaccion.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idCuenta == id){
+				k = true;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "Error, no existe el archivo";
+	}
+	return (k);
+}
+bool verificarSucursalEnCajero(int id){
+	FILE *ptr;
+	Cajeros reg;
+	bool k = false;
+	ptr = fopen("Cajeros.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idSucursal == id){
+				k = true;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "Error, no existe el archivo";
+	}
+	return (k);
+}
+bool verificarCajeroEnTransaccion(int id){
+	FILE *ptr;
+	Transaccion reg;
+	bool k = false;
+	ptr = fopen("Transaccion.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idCajero == id){
+				k = true;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "Error, no existe el archivo";
+	}
+	return (k);
+}
+//Validaciones
+bool validarTelefono(char t[N]){
+	bool k = true;
+	int n, i; 
+	n = strlen(t);
+	for(i = 0; i < n; i++){
+		if(t[i] < 48 || t[i] > 57){
+			k = false;
+		}
+	}
+	return(k);
+}
+bool validarCorreo(char correo[N]){
+	int tam, a, i, j;
+	bool k = false;
+	char dominio[30];
+	tam = strlen(correo);
+	for (i = 0; i < tam; i++){
+		if (correo[i] == '@'){
+			if (i == 0){
+				return(false);
+			}
+			for (j = 0; j < tam - i; j++){
+				dominio[j] = correo[j + i + 1];
+			}
+			dominio[j] = '\0';
+			if (strcmp(dominio, "hotmail.com") == 0 || strcmp(dominio, "gmail.com") == 0 || strcmp(dominio, "yahoo.com") == 0 || strcmp(dominio, "hotmail.es") == 0 || strcmp(dominio, "outlook.com") == 0){
+				k = true;
+			}else{
+				return(false); 
+			}
+			k = true;
+		}
+	}
+	return(k);
+}
+bool validarNumero(char n[N]){
+	bool k = true;
+	int tam, i;
+	tam = strlen(n);
+	for(i = 0; i < tam; i++){
+		if(n[i] < 48 || n[i] > 57){
+			k = false;
+		}
+	}
+	return(k);
+}
+void leer_numero(char msg[], int& num) {
+    cout << endl << msg;
+    cin >> num;
+	while((cin.fail()) || (num<0) || (cin.fail())&&(num>0)){
+		cout << endl << "ERROR! Caracter no valido!";
+		cout << endl << msg;
+		cin.clear();
+		cin.ignore(100,'\n');
+		cin >> num;
+    }
+}
+void leer_numero_f(char msg[], float& num){
+	cout << endl << msg;
+	cin >> num;
+	while((cin.fail())||(num<0)||(cin.fail())&&(num>0)){
+		cout << endl << "ERROR!,Caracter no Valido!";
+		cout << endl << msg;
+		cin.clear();
+		cin.ignore(100,'\n');
+		cin>>num;
+	}
+}
+void convertirALiteral(int numero){
+	int  n1, n2, n3, n4, n5;
+	n1 = numero / 10000;
+	n2 = (numero / 1000) % 10;
+	n3 = (numero / 100) % 10;
+	n4 = (numero / 10) % 10;
+	n5 = (numero % 10);
+   if(numero > 10000){
+      //cout<<"El numero ingresado excede el rango de valores";
+   }else{
+	   if(n1 == 1){
+		   cout<<"Diez mil";
+	   }
+      //Sentencia para determinar los miles
+	   if(n2 == 1){
+		   cout<<"MIL ";
+      }else if(n2 == 2){
+         cout<<"DOS MIL ";
+      }else if(n2 == 3){
+         cout<<"TRES MIL ";
+      }else if(n2 == 4){
+         cout<<"CUATRO MIL ";
+      }else if(n2 == 5){
+         cout<<"CINCO MIL ";
+      }else if(n2 == 6){
+        cout<<"SEIS MIL ";
+      }else if(n2 == 7){
+         cout<<"SIETE MIL ";
+      }else if(n2 == 8){
+         cout<<"OCHO MIL ";
+      }else if(n2 == 9){
+         cout<<"NUEVE MIL ";
+      }
+      //Setencia para determinar los cientos
+      if(n3 == 1 && n4 == 0 && n5 == 0){
+         cout<<"CIEN";
+      }else if(n3 == 1){
+         cout<<"CIENTO ";
+      }else if(n3 == 2){
+         cout<<"DOSCIENTOS ";
+      }else if(n3 == 3){
+         cout<<"TRESCIENTOS ";
+      }else if(n3 == 4){
+         cout<<"CUATROCIENTOS ";
+      }else if(n3 == 5){
+         cout<<"QUINIENTOS ";
+      }else if(n3 == 6){
+         cout<<"SEISCIENTOS ";
+      }else if(n3 == 7){
+         cout<<"SETECIENTOS ";
+      }else if(n3 == 8){
+         cout<<"OCHOCIENTOS ";
+      }else if(n3 == 9){
+         cout<<"NOVECIENTOS ";
+      }
+      //Setencia para determinar las decenas
+      if(n4 == 1 && n5 == 0){
+         cout<<"DIEZ";
+      }else if(n4 == 1 && n5 == 1){
+         cout<<"ONCE";
+      }else if(n4 == 1 && n5 == 2){
+         cout<<"DOCE";
+      }else if(n4 == 1 && n5 == 3){
+         cout<<"TRECE";
+      }else if(n4 == 1 && n5 == 4){
+         cout<<"CATORCE";
+      }else if(n4 == 1 && n5 == 5){
+         cout<<"QUINCE";
+      }else if(n4 == 1){
+         cout<<"DIECI";
+      }
+      if(n4 == 2 && n5 == 0){
+         cout<<"VEINTE";
+      }else if(n4 == 2){
+         cout<<"VEINTI";
+      }else if(n4 == 3 && n5 == 0){
+         cout<<"TREINTA";
+      }else if(n4 == 3){
+         cout<<"TREINTA Y ";
+      }else if(n4 == 4 && n5 == 0){
+         cout<<"CUARENTA";
+      }else if(n4 == 4){
+         cout<<"CUARENTA Y ";
+      }else if(n4 == 5 && n5 == 0){
+         cout<<"CINCUENTA";
+      }else if(n4 == 5){
+         cout<<"CINCUENTA Y ";
+      }else if(n4 == 6 && n5 == 0){
+         cout<<"SESENTA";
+      }else if(n4 == 6){
+         cout<<"SESENTA Y ";
+      }else if(n4 == 7 && n5 == 0){
+         cout<<"SETENTA";
+      }else if(n4 == 7){
+         cout<<"SETENTA Y ";
+      }else if(n4 == 8 && n5 == 0){
+         cout<<"OCHENTA";
+      }else if(n4 == 8){
+         cout<<"OCHENTA Y ";
+      }else if(n4 == 9 && n5 == 0){
+         cout<<"NOVENTA";
+      }
+      else if(n4 == 9){
+         cout<<"NOVENTA Y ";
+      }
+      //Sentencia para determinar las unidades
+      if(n5 == 1 && n4 > 1){
+         cout<<"UNO";
+      }else if(n5 == 1 && n4 == 0){
+         cout<<"UNO";
+      }else if(n5 == 2 && n4 > 1){
+         cout<<"DOS";
+      }else if(n5 == 2 && n4 == 0){
+         cout<<"DOS";
+      }else if(n5 == 3 && n4 > 1){
+         cout<<"TRES";
+      }else if(n5 == 3 && n4 == 0){
+         cout<<"TRES";
+      }else if(n5 == 4 && n4 > 1){
+         cout<<"CUATRO";
+      }else if(n5 == 4 && n4 == 0){
+         cout<<"CUATRO";
+      }else if(n5 == 5 && n4 > 1){
+         cout<<"CINCO";
+      }else if(n5 == 5 && n4 == 0){
+         cout<<"CINCO";
+      }else if(n5 == 6){
+         cout<<"SEIS";
+      }else if(n5 == 7){
+         cout<<"SIETE";
+      }else if(n5 == 8){
+         cout<<"OCHO";
+      }else if(n5 == 9){
+         cout<<"NUEVE";
+      }
+   }
+}
+void Literal(float numero){
+	int n= static_cast<int>(numero);
+    int d= static_cast<int>((numero-n+0.00001)*100);
+    cout<<"\n\n";
+	if(n>10000)
+	{convertirALiteral(n/1000);cout<<" MIL ";
+		n=n%1000;
+		convertirALiteral(n);cout<<" BOLIVIANOS Y ";
+		if(d<1){cout<<"CERO";}
+		else{
+			convertirALiteral(d);}cout<<" CENTAVOS.\t\t";cout<<numero<<"bs."<<endl;}
+	else{
+    if(n<1){cout<<"CERO";}
+    convertirALiteral(n);cout<<" BOLIVIANOS Y ";
+    if(d<1){cout<<"CERO";}
+	convertirALiteral(d);cout<<" CENTAVOS.\t\t";cout<<numero<<"bs."<<endl;}
+}
+void actualizacionDeSaldo(int id, int x){
+	FILE *ptr;
+	Cuenta reg;
+	int idx,idCx,cont=0,pos;
+	char tipoX;
+	char numX[N];
+	float sx;
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			cont++;
+			if(reg.idCuenta == id && reg.estado == 'N'){
+				idx = reg.idCuenta;
+				idCx = reg.idCliente;
+				tipoX = reg.tipoMoneda;
+				strcpy(numX,reg.numero);
+				sx = reg.saldo;
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	ptr = fopen("Cuentas.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr, (pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)){
+			reg.idCuenta = idx;
+			reg.idCliente = idCx;
+			reg.tipoMoneda = tipoX;
+			strcpy(reg.numero,numX);
+			reg.saldo = sx + x;
+			fseek(ptr, (pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+//Validar Fecha
+bool verificarFecha(char fecha[11]){
+    int d,m,y;bool bisiesto=false;
+    sscanf(fecha,"%d/%d/%d",&d,&m,&y);
+
+    if((y%4==0) && (y%100!=100) || (y%400==0))
+        {bisiesto = true;}
+
+    //comprobamos que los datos ingresados esten en un rango valido
+    if(d>0 && d<32 && m>0 && m<13 && y>0)
+        {if(m==1 || m==3 || m==5 || m==7 || m==8 || m==10 || m==12)
+            {return(true);}
+        else
+            {if(m==2 && d<30 && bisiesto)
+                {return(true);}
+            else{if(m==2 && d<29 && !bisiesto)
+                    {return(true);}
+                else {if(m!=2 && d<31)
+                        {return(true);}
+                    else
+                        {return(false);}
+                    }
+               }
+            }
+        }
+    else
+        {return(false);}
+    }
+void ingresarFecha(char fecha[11]){
+    do{
+		gets(fecha);
+	}while(strlen(fecha) == 0);
+    do{
+		if(verificarFecha(fecha) == false){
+			cout << endl << "fecha incorrecta, introduzca otra: ";
+			gets(fecha);
+		}
+    }while(verificarFecha(fecha) == false);
+}
+int compararFechas(char fecha1[],char fecha2[]){
+    	int d1,m1,y1,d2,m2,y2,band=1;
+	sscanf(fecha1,"%d/%d/%d",&d1,&m1,&y1);
+	sscanf(fecha2,"%d/%d/%d",&d2,&m2,&y2);
+	if (y1 < y2)
+	{band = 1;}
+	else
+	{   if (y1 > y2)
+		{band = 0;}
+		else
+		{   if (m1 < m2)
+			{band = 1;}
+			else
+			{   if (m1 > m2)
+				{band = 0;}
+				else
+				{   if (d1 < d2)
+					{band = 1;}
+					else
+					{
+						band = 0;
+					}
+				}
+			}
+		}
+	}
+	return(band);
+}
+//ObtenerPosiciones
+float obtenerSaldo(int id){
+	FILE *ptr;
+	Cuenta reg;
+	float saldo;
+	ptr= fopen("Cuentas.dat","rb");
+	if(ptr!=NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idCliente==id){
+				saldo=reg.saldo;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(saldo);
+}
+int obtenerPosicionClientes(int id){
+	Cliente reg;
+	FILE *ptr;
+	int cont = 0, pos;
+	ptr = fopen("Clientes.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			cont++;
+			if(reg.idCliente == id && reg.estado == 'N'){
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionCuenta(int id){
+	Cuenta reg;
+	FILE *ptr;
+	int cont = 0, pos;
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			cont++;
+			if(reg.idCuenta == id && reg.estado == 'N'){
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionSucursal(int id){
+	Sucursal reg;
+	FILE *ptr;
+	int cont = 0, pos;
+	ptr = fopen("Sucursal.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			cont++;
+			if(reg.idSucursal == id && reg.estado == 'N'){
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionCajeros(int id){
+	Cajeros reg;
+	FILE *ptr;
+	int cont = 0, pos;
+	ptr = fopen("Cajeros.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			cont++;
+			if(reg.idCajero == id && reg.estado == 'N'){
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionTransaccion(int id){
+	Transaccion reg;
+	FILE *ptr;
+	int cont = 0, pos;
+	ptr = fopen("Transaccion.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			cont++;
+			if(reg.idTransaccion == id && reg.estado == 'N'){
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerCuenta(int id){
+	FILE *ptr;
+	Cuenta reg;
+	int idC;
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr!= NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			if(reg.idCliente == id){
+				idC = reg.idCuenta;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+	}else{
+		cout << endl << "El archivo no existe Boludo";
+	}
+	return(idC);
+}
+// Adicionar
+void addClientes(){
+	FILE *ptr;
+	Cliente reg;
+	leer_numero("Ingrese el Id del Cliente: ",reg.idCliente);
+    if(verificaridClientes(reg.idCliente)==true){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idCliente);
+        }while(verificaridClientes(reg.idCliente)==true);
+    }
+	cout << endl << "Ingrese el nombre del cliente: ";
+	do{
+		gets(reg.nombreCliente);
+	}while(strlen(reg.nombreCliente) == 0);
+	do{
+		cout << endl << "Ingrese el numero de Telefono del Cliente: ";
+		do{
+			gets(reg.telefono);
+		}while(strlen(reg.telefono) == 0);
+	}while(validarTelefono(reg.telefono) == false);	
+	do{
+		cout << endl << "Ingrese el correo electronico: ";
+		do{
+			gets(reg.email);
+		}while(strlen(reg.email) == 0);
+	}while(validarCorreo(reg.email) == false);
+	cout << endl << "Ingrese la direccion: ";
+	do{
+		gets(reg.direccion);
+	}while(strlen(reg.direccion) == 0);
+	reg.estado = 'N';
+	ptr = fopen("Clientes.dat","ab");
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void addCuentas(){
+	FILE *ptr;
+	Cuenta reg;
+	leer_numero("Ingrese el Id de Cuenta: ",reg.idCuenta);
+    if(verificaridCuenta(reg.idCuenta) == true){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idCuenta);
+        }while(verificaridCuenta(reg.idCuenta) == true);
+    }
+	do{
+		cout << endl << "Ingrese el numero de cuenta: ";
+		do{
+			gets(reg.numero);
+		}while(strlen(reg.numero) == 0);
+	}while(validarNumero(reg.numero) == false);
+	do{
+		cout << endl << "Ingrese el Tipo de moneda: ";
+		cin >> reg.tipoMoneda;
+	}while(reg.tipoMoneda != 'B' && reg.tipoMoneda != 'D');
+	leer_numero_f("Ingrese el saldo: ",reg.saldo);
+	leer_numero("Ingrese el Id de Cliente al que pertenece la cuenta: ",reg.idCliente);
+    if(verificaridClientes(reg.idCliente) == false){
+        do{
+            cout << endl << "Id ya no existe...";
+			cout << endl;
+            leer_numero("Ingresar el Id de Cliente al que pertenece la cuenta: ",reg.idCliente);
+        }while(verificaridClientes(reg.idCliente) == false);
+    }
+	reg.estado = 'N';
+	ptr = fopen("Cuentas.dat","ab");
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void addSucursal(){
+	FILE *ptr;
+	Sucursal reg;
+	leer_numero("Ingrese el Id de Sucursal: ",reg.idSucursal);
+    if(verificaridSucursal(reg.idSucursal) == true){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idSucursal);
+        }while(verificaridSucursal(reg.idSucursal) == true);
+    }
+	cout << endl << "Ingrese el nombre de la sucursal: ";
+	do{
+		gets(reg.nombre);
+	}while(strlen(reg.nombre) == 0);
+	cout << endl << "Ingrese la direccion: ";
+	do{
+		gets(reg.direccion);
+	}while(strlen(reg.direccion) == 0);
+	do{
+		cout << endl << "Ingrese el telefono de la Sucursal: ";
+		do{
+			gets(reg.telefono);
+		}while(strlen(reg.telefono) == 0);
+	}while(validarTelefono(reg.telefono) == false);
+	reg.estado = 'N';
+	ptr = fopen("Sucursal.dat","ab");
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void addCajero(){
+	FILE *ptr;
+	Cajeros reg;
+	leer_numero("Ingrese el Id de Cajero: ",reg.idCajero);
+    if(verificaridCajero(reg.idCajero) == true){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idCajero);
+        }while(verificaridCajero(reg.idCajero) == true);
+    }
+	cout << endl << "Ingrese el nombre del Cajero: ";
+	do{
+		gets(reg.nombre);
+	}while(strlen(reg.nombre) == 0);
+	do{
+		cout << endl << "Ingrese el email del Cajero: ";
+		do{
+			gets(reg.email);
+		}while(strlen(reg.email) == 0);
+	}while(validarCorreo(reg.email) == false);
+	do{
+		cout << endl << "Ingrese el telefono del Cajero: ";
+		do{
+			gets(reg.telefono);
+		}while(strlen(reg.telefono) == 0);
+	}while(validarTelefono(reg.telefono) == false);
+	leer_numero("Ingrese el Id de Sucursal en el que trabaja el cajero: ",reg.idSucursal);
+    if(verificaridSucursal(reg.idSucursal) == false){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idSucursal);
+        }while(verificaridSucursal(reg.idSucursal) == false);
+    }
+	reg.estado = 'N';
+	ptr = fopen("Cajeros.dat","ab");
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void addTransaccion(){
+	FILE *ptr;
+	Transaccion reg;
+	leer_numero("Ingrese el Id de Transaccion: ",reg.idTransaccion);
+    if(verificaridTransaccion(reg.idTransaccion)==true){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idTransaccion);
+        }while(verificaridTransaccion(reg.idTransaccion)==true);
+    }
+	cout<<"ingrese la fecha con formato (dd/mm/aa): "<<endl;
+    ingresarFecha(reg.fecha);
+	do{
+		cout << endl << "Ingrese el Tipo de transaccion: ";
+		cin >> reg.tipoTransaccion;
+	}while(reg.tipoTransaccion != 'R' && reg.tipoTransaccion != 'D');
+	leer_numero("Ingrese el Id de Cuenta: ",reg.idCuenta);
+    if(verificaridCuenta(reg.idCuenta) == false){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idCuenta);
+        }while(verificaridCuenta(reg.idCuenta) == false);
+    }
+	leer_numero_f("Ingrese el monto: ",reg.monto);
+	if(reg.tipoTransaccion == 'R'){
+		if(verificacionDeSaldo(reg.monto,reg.idCuenta) == false){
+			do{
+				cout << endl << "El monto excede el saldo de la cuenta...";
+				cout << endl;
+				leer_numero_f("Ingrese el monto: ",reg.monto);
+			}while(verificacionDeSaldo(reg.monto,reg.idCuenta) == false);
+		}
+		actualizacionDeSaldo(reg.idCuenta,reg.monto*-1);
+	}else{
+		actualizacionDeSaldo(reg.idCuenta,reg.monto);
+	}
+	leer_numero("Ingrese el Id de Cajero que realiza la operacion: ",reg.idCajero);
+    if(verificaridCajero(reg.idCajero) == false){
+        do{
+            cout << endl << "Id ya existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que no exista: ",reg.idCajero);
+        }while(verificaridCajero(reg.idCajero) == false);
+    }
+	reg.estado = 'N';
+	ptr = fopen("Transaccion.dat","ab");
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+//Mostrar
+void mostrarClientes(){
+	Cliente reg;
+	FILE *ptr;
+	ptr = fopen("Clientes.dat","rb");
+	if(ptr != NULL){
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "---------------------------- LISTADO DE CLIENTES ----------------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id Cliente" << setw(16) << "Nombre Cliente" << setw(12) << "Telefono" << setw(18) << "Email" << setw(20) << "Direccion";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << setw(5) << reg.idCliente << setw(20) << reg.nombreCliente << setw(12) << reg.telefono << setw(25) << reg.email << setw(12) << reg.direccion;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}else{
+		cout << "No existe el Archivo...B o l u d o";
+	}
+	fclose(ptr);
+}
+void mostrarCuenta(){
+	Cuenta reg;
+	FILE *ptr;
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr != NULL){
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "----------------------------- LISTADO DE CUENTA -----------------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id Cuenta" << setw(20) << "Numero de Cuenta" << setw(18) << "Tipo de Moneda" << setw(10) << "Saldo" << setw(18) << "idCliente";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << setw(5) << reg.idCuenta << setw(15) << reg.numero << setw(21) << reg.tipoMoneda << setw(16) << reg.saldo << setw(14) << reg.idCliente;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}else{
+		cout << "No existe el Archivo...B o l u d o";
+	}
+	fclose(ptr);
+}
+void mostrarSucursal(){
+	Sucursal reg;
+	FILE *ptr;
+	ptr = fopen("Sucursal.dat","rb");
+	if(ptr != NULL){
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "------------------------- LISTADO DE SUCURSAL -------------------------";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "Id Sucursal" << setw(10) << "Nombre" << setw(18) << "Direccion" << setw(18) << "Telefono";
+		cout << endl << "-----------------------------------------------------------------------";
+		while(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << setw(5) << reg.idSucursal << setw(15) << reg.nombre << setw(15) << reg.direccion << setw(20) << reg.telefono;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------";
+	}else{
+		cout << "No existe el Archivo...B o l u d o";
+	}
+	fclose(ptr);
+}
+void mostrarCajeros(){
+	Cajeros reg;
+	FILE *ptr;
+	ptr = fopen("Cajeros.dat","rb");
+	if(ptr != NULL){
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "------------------------- LISTADO DE CAJEROS --------------------------";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "Id Cajero" << setw(12) << "Nombre" << setw(16) << "Email" << setw(16) << "Telefono" << setw(18) << "id Sucursal";
+		cout << endl << "-----------------------------------------------------------------------";
+		while(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << setw(5) << reg.idCajero << setw(15) << reg.nombre << setw(21) << reg.email << setw(12) << reg.telefono << setw(15) << reg.idSucursal;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------";
+	}else{
+		cout << "No existe el Archivo...B o l u d o";
+	}
+	fclose(ptr);
+}
+void mostrarTransaccion(){
+	Transaccion reg;
+	FILE *ptr;
+	ptr = fopen("Transaccion.dat","rb");
+	if(ptr != NULL){
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "--------------------------------------------------------------------------";
+		cout << endl << "------------------------- LISTADO DE TRANSACCION -------------------------";
+		cout << endl << "--------------------------------------------------------------------------";
+		cout << endl << "Id Transaccion" << setw(6) << "Fecha" << setw(18) << "TipoTrans" << setw(8) << "Monto" << setw(13) << "id Cuenta" << setw(14) << "id Cajero";
+		cout << endl << "--------------------------------------------------------------------------";
+		while(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << setw(5) << reg.idTransaccion << setw(20) << reg.fecha << setw(8) << reg.tipoTransaccion << setw(13) << reg.monto << setw(12) << reg.idCuenta << setw(12) << reg.idCajero;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "--------------------------------------------------------------------------";
+	}else{
+		cout << "No existe el Archivo...B o l u d o";
+	}
+	fclose(ptr);
+}
+//Modificar
+void modificarClientes(){
+	FILE *ptr;
+	Cliente reg;
+	int id, pos;
+	mostrarClientes();
+	leer_numero("Ingrese el Id del Cliente que desea modificar: ",id);
+    if(verificaridClientes(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridClientes(id) == false);
+    }
+	pos = obtenerPosicionClientes(id);
+	ptr = fopen("Clientes.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			reg.idCliente = id;
+			cout << endl << "Ingrese el nombre del cliente: ";
+			do{
+				gets(reg.nombreCliente);
+			}while(strlen(reg.nombreCliente) == 0);
+			do{
+				cout << endl << "Ingrese el numero de Telefono del Cliente: ";
+				do{
+					gets(reg.telefono);
+				}while(strlen(reg.telefono) == 0);
+			}while(validarTelefono(reg.telefono) == false);
+			do{
+				cout << endl << "Ingrese el correo electronico: ";
+				do{
+					gets(reg.email);
+				}while(strlen(reg.email) == 0);
+			}while(validarCorreo(reg.email) == false);
+			cout << endl << "Ingrese la direccion: ";
+			do{
+				gets(reg.direccion);
+			}while(strlen(reg.direccion) == 0);
+			reg.estado = 'N';
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarCuenta(){//deberia obtener el cliente igual
+	FILE *ptr;
+	Cuenta reg;
+	int id, pos;
+	mostrarCuenta();
+	leer_numero("Ingrese el Id de Cuenta que desea modificar: ",id);
+    if(verificaridCuenta(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridCuenta(id) == false);
+    }
+	pos = obtenerPosicionCuenta(id);
+	ptr = fopen("Cuentas.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			reg.idCuenta = id;
+			cout << endl << "Ingrese el numero de cuenta: ";
+			do{
+				gets(reg.numero);
+			}while(strlen(reg.numero) == 0);
+			cout << endl << "Ingrese el Tipo de moneda: ";
+			cin >> reg.tipoMoneda;
+			leer_numero_f("Ingrese el saldo: ",reg.saldo);//No deberia cambiar de cliente...
+			leer_numero("Ingrese el Id de Cliente al que pertenece la cuenta: ",reg.idCliente);
+			if(verificaridClientes(reg.idCliente) == false){
+				do{
+					cout << endl << "Id ya no existe...";
+					cout << endl;
+					leer_numero("Ingresar el Id de Cliente al que pertenece la cuenta: ",reg.idCliente);
+				}while(verificaridClientes(reg.idCliente) == false);
+			}
+			reg.estado == 'N';
+			fseek(ptr,(pos-1)*sizeof(ptr),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarSucursal(){
+	FILE *ptr;
+	Sucursal reg;
+	int id, pos;
+	mostrarSucursal();
+	leer_numero("Ingrese el Id de Sucursal que desea modificar: ",id);
+    if(verificaridSucursal(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridSucursal(id) == false);
+    }
+	pos = obtenerPosicionSucursal(id);
+	ptr = fopen("Sucursal.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			reg.idSucursal = id;
+			cout << endl << "Ingrese el nombre de la sucursal: ";
+			do{
+				gets(reg.nombre);
+			}while(strlen(reg.nombre) == 0);
+			cout << endl << "Ingrese la direccion: ";
+			do{
+				gets(reg.direccion);
+			}while(strlen(reg.direccion) == 0);
+			do{
+				cout << endl << "Ingrese el telefono de la Sucursal: ";
+				do{
+					gets(reg.telefono);
+				}while(strlen(reg.telefono) == 0);
+			}while(validarTelefono(reg.telefono) == false);
+			reg.estado == 'N';
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarCajeros(){
+	FILE *ptr;
+	Cajeros reg;
+	int id, pos;
+	mostrarCajeros();
+	leer_numero("Ingrese el Id Cajero que desea modificar: ",id);
+    if(verificaridCajero(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridCajero(id) == false);
+    }
+	pos = obtenerPosicionCajeros(id);
+	ptr = fopen("Cajeros.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			reg.idCajero = id;
+			cout << endl << "Ingrese el nombre del Cajero: ";
+			do{
+				gets(reg.nombre);
+			}while(strlen(reg.nombre) == 0);
+			do{
+				cout << endl << "Ingrese el email del Cajero: ";
+				do{
+					gets(reg.email);
+				}while(strlen(reg.email) == 0);
+			}while(validarCorreo(reg.email) == false);
+			cout << endl << "Ingrese el telefono del Cajero: ";
+			do{
+				do{
+					gets(reg.telefono);
+				}while(strlen(reg.telefono) == 0);
+			}while(validarTelefono(reg.telefono) == false);
+			leer_numero("Ingrese el Id de Sucursal en el que trabaja el cajero: ",reg.idSucursal);
+			if(verificaridSucursal(reg.idSucursal) == false){
+				do{
+					cout << endl << "Id ya existe...";
+					cout << endl;
+					leer_numero("Ingresar un Id que no exista: ",reg.idSucursal);
+				}while(verificaridSucursal(reg.idSucursal) == false);
+			}
+			reg.estado == 'N';
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarTransaccion(){
+	FILE *ptr;
+	Transaccion reg;
+	int id, pos;
+	mostrarTransaccion();
+	leer_numero("Ingrese el Id de Transaccion que desea modificar: ",id);
+    if(verificaridTransaccion(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridTransaccion(id) == false);
+    }
+	pos = obtenerPosicionTransaccion(id);
+	ptr = fopen("Transaccion.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			reg.idTransaccion = id;
+			cout<<"ingrese la fecha con formato (dd/mm/aa): "<<endl;
+			ingresarFecha(reg.fecha);
+			cout << endl << "Ingrese el Tipo de transaccion: ";
+			cin >> reg.tipoTransaccion;
+			leer_numero("Ingrese el Id de Cuenta: ",reg.idCuenta);
+			if(verificaridCuenta(reg.idCuenta) == false){
+				do{
+					cout << endl << "Id ya existe...";
+					cout << endl;
+					leer_numero("Ingresar un Id que no exista: ",reg.idCuenta);
+				}while(verificaridCuenta(reg.idCuenta) == false);
+			}
+			leer_numero_f("Ingrese el monto: ",reg.monto);
+			if(reg.tipoTransaccion == 'R'){
+				if(verificacionDeSaldo(reg.monto,reg.idCuenta) == false){
+					do{
+						cout << endl << "El monto excede el saldo de la cuenta...";
+						cout << endl;
+						leer_numero_f("Ingrese el monto: ",reg.monto);
+					}while(verificacionDeSaldo(reg.monto,reg.idCuenta) == false);
+				}
+				actualizacionDeSaldo(reg.idCuenta,reg.monto*-1);
+			}else{
+				actualizacionDeSaldo(reg.idCuenta,reg.monto);
+			}
+			leer_numero("Ingrese el Id de Cajero que realiza la operacion: ",reg.idCajero);
+			if(verificaridCajero(reg.idCajero) == false){
+				do{
+					cout << endl << "Id ya existe...";
+					cout << endl;
+					leer_numero("Ingresar un Id que no exista: ",reg.idCajero);
+				}while(verificaridCajero(reg.idCajero) == false);
+			}
+			reg.estado == 'N';
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+//Buscar
+void buscarClientes(){
+	FILE *ptr;
+	Cliente reg;
+	int id,pos;
+	leer_numero("Ingrese el Id del Cliente que desea buscar: ",id);
+    if(verificaridClientes(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridClientes(id) == false);
+    }
+	pos = obtenerPosicionClientes(id);
+	ptr = fopen("Clientes.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+				cout << endl << "-------------------------------------------";
+				cout << endl << reg.idCliente << setw(12) << reg.nombreCliente << setw(12) << reg.telefono << setw(12) << reg.email << setw(12) << reg.direccion;
+				cout << endl << "-------------------------------------------";
+			}
+		}
+	fclose(ptr);
+}
+void buscarCuenta(){
+	FILE *ptr;
+	Cuenta reg;
+	int id, pos;
+	leer_numero("Ingrese el Id de Cuenta que desea buscar: ",id);
+    if(verificaridCuenta(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridCuenta(id) == false);
+    }
+	pos = obtenerPosicionCuenta(id);
+	ptr = fopen("Cuentas.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << "----------------------------";
+			cout << endl << reg.idCuenta << setw(12) << reg.numero << setw(12) << reg.tipoMoneda << setw(12) << reg.saldo << setw(12) << reg.idCliente;
+			cout << endl << "----------------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarSucursal(){
+	FILE *ptr;
+	Sucursal reg;
+	int id, pos;
+	leer_numero("Ingrese el Id de Sucursal que desea buscar: ",id);
+    if(verificaridSucursal(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridSucursal(id) == false);
+    }
+	pos = obtenerPosicionSucursal(id);
+	ptr = fopen("Sucursal.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << "-------------------";
+			cout << endl << reg.idSucursal << setw(12) << reg.nombre <<setw(12) << reg.direccion << setw(12) << reg.telefono;
+			cout << endl << "-------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarCajeros(){
+	FILE *ptr;
+	Cajeros reg;
+	int id, pos;
+	leer_numero("Ingrese el Id Cajero que desea buscar: ",id);
+    if(verificaridCajero(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridCajero(id) == false);
+    }
+	pos = obtenerPosicionCajeros(id);
+	ptr = fopen("Cajeros.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << "----------------------------------";
+			cout << endl << reg.idCajero << setw(12) << reg.nombre << setw(12) << reg.email << setw(12) << reg.telefono << setw(12) << reg.idSucursal;
+			cout << endl << "----------------------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarTransaccion(){
+	FILE *ptr;
+	Transaccion reg;
+	int id, pos;
+	leer_numero("Ingrese el Id de Transaccion que desea buscar: ",id);
+    if(verificaridTransaccion(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridTransaccion(id) == false);
+    }
+	pos = obtenerPosicionTransaccion(id);
+	ptr = fopen("Transaccion.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			cout << endl << "-------------------------";
+			cout << endl << reg.idTransaccion << setw(12) << reg.fecha << setw(12) << reg.tipoTransaccion << setw(12) << reg.monto << setw(12) << reg.idCuenta << setw(12) << reg.idCajero;
+			cout << endl << "-------------------------";
+		}
+	}
+	fclose(ptr);
+}
+//Eliminar
+void eliminarClientes(){
+	FILE *ptr;
+	Cliente reg;
+	int id,pos;
+	leer_numero("Ingrese el Id del Cliente que desea eliminar: ",id);
+    if(verificaridClientes(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridClientes(id) == false);
+    }
+	if(verificarClienteEnCuenta(id) == false){
+		pos = obtenerPosicionClientes(id);
+		ptr = fopen("Clientes.dat","r+b");
+		if(ptr != NULL){
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fread(&reg,sizeof(reg),1,ptr);
+			if(!feof(ptr) && reg.estado == 'N'){
+				reg.estado = 'S';
+				fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+				fwrite(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "No se puede Eliminar el Cliente dado que tiene cuentas asociados a el";
+	}
+}
+void eliminarCuenta(){
+	FILE *ptr;
+	Cuenta reg;
+	int id, pos;
+	leer_numero("Ingrese el Id de Cuenta que desea eliminar: ",id);
+    if(verificaridCuenta(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridCuenta(id) == false);
+    }
+	if(verificarCuentaEnTransaccion(id) == false){
+		pos = obtenerPosicionCuenta(id);
+		ptr = fopen("Cuentas.dat","r+b");
+		if(ptr != NULL){
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fread(&reg,sizeof(reg),1,ptr);
+			if(!feof(ptr) && reg.estado == 'N'){
+				reg.estado = 'S';
+				fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+				fwrite(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "No se puede elminar la Cuenta dado que tiene Transacciones asociadas a ella";
+	}
+}
+void eliminarSucursal(){
+	FILE *ptr;
+	Sucursal reg;
+	int id, pos;
+	leer_numero("Ingrese el Id de Sucursal que desea eliminar: ",id);
+    if(verificaridSucursal(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridSucursal(id) == false);
+    }
+	if(verificarSucursalEnCajero(id) == false){
+		pos = obtenerPosicionSucursal(id);
+		ptr = fopen("Sucursal.dat","rb");
+		if(ptr != NULL){
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fread(&reg,sizeof(reg),1,ptr);
+			if(!feof(ptr) && reg.estado == 'N'){
+				reg.estado = 'S';
+				fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+				fwrite(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "No se puede eliminar la sucursal dado que tiene Cajeros asociadas a ella";
+	}
+}
+void eliminarCajeros(){
+	FILE *ptr;
+	Cajeros reg;
+	int id, pos;
+	leer_numero("Ingrese el Id Cajero que desea buscar: ",id);
+    if(verificaridCajero(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridCajero(id) == false);
+    }
+	if(verificarCajeroEnTransaccion(id) == false){
+		pos = obtenerPosicionCajeros(id);
+		ptr = fopen("Cajeros.dat","r+b");
+		if(ptr != NULL){
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fread(&reg,sizeof(reg),1,ptr);
+			if(!feof(ptr) && reg.estado == 'N'){
+				reg.estado = 'S';
+				fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+				fwrite(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		fclose(ptr);
+	}else{
+		cout << endl << "No se puede eliminar el cajero dado que tiene Transacciones asociadas a el";
+	}
+}
+void eliminarTransaccion(){
+	FILE *ptr;
+	Transaccion reg;
+	int id, pos;
+	leer_numero("Ingrese el Id de Transaccion que desea buscar: ",id);
+    if(verificaridTransaccion(id) == false){
+        do{
+            cout << endl << "Id no existe...";
+			cout << endl;
+            leer_numero("Ingresar un Id que exista: ",id);
+        }while(verificaridTransaccion(id) == false);
+    }
+	pos = obtenerPosicionTransaccion(id);
+	ptr = fopen("Transaccion.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 'N'){
+			reg.estado = 'S';
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	fclose(ptr);
+}
+// Archivo Tipo Texto
+void addArchivoTexto(){
+	FILE *ptr;
+	char *cad;
+	cad = "TIPOCAMBIO=\"6.9\" \nIMPUESTO=\"10.5\"\x0";
+	ptr = fopen("Config.txt","a");
+	if(ptr!= NULL){
+		//fputs(cad,ptr);
+		fprintf(ptr, cad);
+		fclose(ptr);
+	}
+}
+void addDatosConfig(float tc, float imp){
+	FILE *ptr;
+	ptr=fopen("Config.txt","w");
+	if(ptr!=NULL){
+		fprintf(ptr,"TIPOCAMBIO= %f\n",tc);
+		fprintf(ptr,"IMPUESTO= %f\n",imp);
+	}
+	fclose(ptr);
+}
+void mostrarArchivoTexto(){
+	FILE *ptr;
+	char cad;
+	//char *cad;
+	cout << endl << "--------------------------------------------------------------------------------";
+	cout << endl << "********    CONFIGURACION    ********";
+	cout << endl << "--------------------------------------------------------------------------------";
+	ptr = fopen("Config.txt","r");
+	if(ptr == NULL){
+		cout << "ERROR...Archivo no Existe";
+	}else{
+		cad = fgetc(ptr);
+		while(feof(ptr) == false){
+			cout << cad;
+			cad = fgetc(ptr);
+		}
+		fclose(ptr);
+	}
+}
+//EXTREAR INFO DE ARCHIVO TEXTO
+float obtenerTipoCambio(float &tc){
+	FILE *ptr;
+	ptr=fopen("Config.txt","r");
+	if(ptr!=NULL){
+		fscanf(ptr,"TIPOCAMBIO= %f\n",&tc);
+	}
+	fclose(ptr);
+	return(tc);
+}
+float obtenerImpuesto(float &imp){
+	FILE *ptr;
+	float tc;
+	ptr=fopen("Config.txt","r");
+	if(ptr!=NULL){
+		fscanf(ptr,"TIPOCAMBIO=%f\n",&tc);
+		fscanf(ptr,"IMPUESTO=%f",&imp);
+	}
+	fclose(ptr);
+	return(imp);
+}
+//Reportes
+void extractoDeCuentaEntreFechas(int id, char fecha1[11],char fecha2[11]){
+	FILE *ptr;
+	Transaccion reg;
+	int c1 = compararFechas(fecha1,fecha2);
+    int c2;
+    if(compararFechas(fecha1,fecha2) == 1){
+		ptr = fopen("Transaccion.dat","rb");
+		if(ptr == NULL){
+			cout << endl << "Error...no existe el archivo";
+		}else{
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "---------------------------- Extracto de Cuenta ----------------------------";
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "Cuenta: "<< setw(5) << id;
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "Entre las Fechas: " << fecha1 << setw(3) << "y" << setw(12) << fecha2;
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "IdTrans" << setw(8) << "Fecha" << setw(15) << "TipoTrans" << setw(10) << "Monto" << setw(12) << "IdCajero" << setw(13) << "IdCuenta";
+			cout << endl << "----------------------------------------------------------------------------";
+			fread(&reg,sizeof(reg),1,ptr);
+			while(!feof(ptr)){
+				if(reg.idCuenta == id){
+					c1=compararFechas(fecha1,reg.fecha);
+					c2=compararFechas(reg.fecha,fecha2);
+					if((c1==1)&&(c2==1)){
+						cout << endl << reg.idTransaccion << setw(12) << reg.fecha << setw(12) << reg.tipoTransaccion << setw(12) << reg.monto << setw(12) << reg.idCuenta << setw(12) << reg.idCajero;
+					}
+				}
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		fclose(ptr);
+		}
+	}else{
+		cout << endl << "Fechas Incogrugentes";
+	}
+}
+void extractoDeCuentaEntreFechasDolar(int id, char fecha1[11],char fecha2[11]){
+	FILE *ptr;
+	Transaccion reg;
+	float tc;
+	int c1=compararFechas(fecha1,fecha2);
+    int c2;
+    if(compararFechas(fecha1,fecha2)==1){
+		ptr = fopen("Transaccion.dat","rb");
+		if(ptr == NULL){
+			cout << endl << "Error...no existe el archivo";
+		}else{
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "-------------------------- Extracto de Cuenta ($) --------------------------";
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "Cuenta: "<< setw(5) << id;
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "Entre las Fechas: " << fecha1 << setw(3) << "y" << setw(12) << fecha2;
+			cout << endl << "----------------------------------------------------------------------------";
+			cout << endl << "IdTrans" << setw(8) << "Fecha" << setw(15) << "TipoTrans" << setw(10) << "Monto" << setw(12) << "IdCajero" << setw(13) << "IdCuenta";
+			cout << endl << "----------------------------------------------------------------------------";
+			fread(&reg,sizeof(reg),1,ptr);
+			while(!feof(ptr)){
+				if(reg.idCuenta == id){
+					c1 = compararFechas(fecha1,reg.fecha);
+					c2 = compararFechas(reg.fecha,fecha2);
+					tc = obtenerTipoCambio(tc);
+					if((c1==1)&&(c2==1)){
+						cout << endl << reg.idTransaccion << setw(12) << reg.fecha << setw(12) << reg.tipoTransaccion << setw(12) << reg.monto/tc << setw(12) << reg.idCuenta << setw(12) << reg.idCajero;
+					}
+				}
+			fread(&reg,sizeof(reg),1,ptr);
+			}
+		fclose(ptr);
+		}
+	}else{
+		cout << endl << "Fechas incongrugentes";
+	}
+}
+void ordenarClientes(){
+	FILE *ptr;
+	Cliente reg, vec[50], aux;
+	int i=0,j,k,f;
+	ptr=fopen("Clientes.dat","rb");
+	if(ptr!=NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			vec[i]=reg;
+			i++;
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	for(j=0;j<i;j++){
+		for(k=j+1;k<i;k++){
+			if(obtenerSaldo(vec[j].idCliente)>obtenerSaldo(vec[k].idCliente)){
+				aux=vec[j];
+				vec[j]=vec[k];
+				vec[k]=aux;
+			}
+		}
+		}
+	
+	for(f=0;f<i;f++){
+		cout<<vec[f].idCliente<<vec[f].nombreCliente<<vec[f].telefono<<vec[f].email<<vec[f].direccion;
+	}
+}
+float obtenerSaldo(int idCuenta, char fecha1[11], char fecha2[11]){
+	FILE *ptr;
+	Transaccion reg;
+	float saldo=0;
+	int c1=compararFechas(fecha1,fecha2);
+    int c2;
+    if(compararFechas(fecha1,fecha2)==1){
+		ptr = fopen("Transaccion.dat","rb");
+		if(ptr != NULL){
+			fread(&reg,sizeof(reg),1,ptr);
+			while(!feof(ptr)){
+				if(reg.idCuenta == idCuenta){
+					c1=compararFechas(fecha1,reg.fecha);
+					c2=compararFechas(reg.fecha,fecha2);
+					if((c1==1)&&(c2==1)){
+						saldo = saldo + reg.monto;
+					}
+				}
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}else{
+			cout << endl << "No existe el archivo boludo";
+		}
+	}else{
+		cout << endl << "Fechas incorrectas";
+	}
+	return(saldo);
+}					
+void clienteMasTransaccion(char fecha1[11],char fecha2[11]){
+	Cliente reg,vec[100],aux;
+	FILE *ptr;
+	int tam, i,j;
+	int cuentaI,cuentaJ,cuenta;
+	float saldo,may;
+	ptr = fopen("Clientes.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr)){
+			vec[tam] = reg;
+			tam++;
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+	}else{
+		cout << endl << "El archivo no existe Boludo";
+	}
+	fclose(ptr);
+	for(i=0; i<tam; i++){
+		for(j=i+1; j<tam; j++){
+			cuentaI = obtenerCuenta(vec[i].idCliente);
+			cuentaJ = obtenerCuenta(vec[j].idCliente);
+			if(obtenerSaldo(cuentaI,fecha1,fecha2) <obtenerSaldo(cuentaJ,fecha1,fecha2)){
+				aux = vec[i];
+				vec[i] = vec[j];
+				vec[j] = aux;
+			}
+		}
+	}
+	may = 0;
+	for(i=0; i<tam; i++){
+		cuenta=obtenerCuenta(vec[i].idCliente);
+		saldo=obtenerSaldo(cuenta,fecha1,fecha2);
+		if(may <= obtenerSaldo(cuenta,fecha1,fecha2)){
+			cout << vec[i].idCliente << vec[i].nombreCliente << saldo;
+			may = saldo;
+		}
+	}
+}
+//cliente que mas gana
+float obtenerSaldosDeCuenta(int id, char fecha1[11], char fecha2[11]){
+	float total = 0;
+	FILE *ptr;
+	Cuenta reg;
+	int c1=compararFechas(fecha1,fecha2);
+    int c2;
+    if(compararFechas(fecha1,fecha2)==1){
+		ptr = fopen("Cuentas.dat","rb");
+		if(ptr != NULL){
+			fread(&reg,sizeof(reg),1,ptr);
+			while(!feof(ptr)){
+				if(reg.idCliente == id){
+					total = total + obtenerSaldo(reg.idCuenta,fecha1,fecha2);
+				}
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}else{
+		cout << endl << "Archivo incorrecto";
+		}
+	}else{
+		cout << endl << "Fechas incorrectas";
+	}
+	return(total);
+}
+void listarClienteMasTransaccion(char fecha1[11],char fecha2[11]){
+	FILE *ptr;
+	Cliente reg, vec[100],aux;
+	int tam = 0,tam2 = 0,i,j;
+	float vecN[100],auxN,may;
+	int c1=compararFechas(fecha1,fecha2);
+    int c2;
+    if(compararFechas(fecha1,fecha2)==1){
+		ptr = fopen("Clientes.dat","rb");
+		if(ptr != NULL){
+			fread(&reg,sizeof(reg),1,ptr);
+			while(!feof(ptr)){
+				vec[tam] = reg;
+				tam++;
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}else{
+			cout << "Archivo no Existe: ";
+		}
+		for(i=0;i<tam;i++){
+			vecN[tam2] = obtenerSaldosDeCuenta(vec[i].idCliente,fecha1,fecha2);
+			tam2++;
+		}
+		for(i=0;i<tam;i++){
+			for(j=i+1;j<tam;j++){
+				if(vecN[i] < vecN[j]){
+					auxN = vecN[i];
+					aux = vec[i];
+					vecN[i] = vecN[j];
+					vec[i] = vec[j];
+					vecN[j] = auxN;
+					vec[j] = aux;
+				}
+			}
+		}
+		may = 0;
+		cout << endl << "---------------------------------------------------------------------";
+		cout << endl << "--------------REPORTE DE CLIENTE CON MAS TRANSACCIONES---------------";
+		cout << endl << "---------------------------------------------------------------------";
+		cout << endl << " Id Cliente " << setw(10) << "Nombre" << setw(25) << "Monto Acumulado";
+		cout << endl << "---------------------------------------------------------------------";
+		for(i=0;i<tam;i++){
+			if(may <= vecN[i]){
+				cout << endl << setw(5) << vec[i].idCliente << setw(18)<< vec[i].nombreCliente << setw(18) << vecN[i];
+				may = vecN[i];
+			}
+		}
+		cout << endl << "---------------------------------------------------------------------";
+	}else{
+		cout << endl << "Fechas erroneas";
+	}
+}
+//Funciones de ayuda
+void invertirNombre(char nombre[30]){
+	char aux[30];
+	int i,j,pos;
+	i=0;
+	while(nombre[i]!=' '){
+		i++;
+	}
+	j=0;
+	pos=i;
+	i++;
+	while(nombre[i]!='\0'){
+		aux[j]=nombre[i];
+		i++;
+		j++;
+	}
+	aux[j]=' ';
+	j++;
+	i=0;
+	while(i<pos){
+		aux[j]=nombre[i];
+		i++;
+		j++;
+	}
+	aux[j]='\0';
+	strcpy(nombre,aux);
+}
+// Menus Separados
+void mainClientes(){
+	int opc1;
+	do{
+		cout << endl << "-----------------------------------------";
+		cout << endl << "------- M E N U - C L I E N T E S -------";
+		cout << endl << "-----------------------------------------";
+		cout << endl << "1.- Adicionar: ";
+		cout << endl << "2.- Mostrar: ";
+		cout << endl << "3.- Modificar: ";
+		cout << endl << "4.- Eliminar: ";
+		cout << endl << "5.- Buscar: ";
+		cout << endl << "6.- Pasar a Archivo tipo Texto: ";
+		cout << endl << "-----------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc1);
+		switch(opc1){
+		case 1: 
+			addClientes();
+			break;
+		case 2:
+			mostrarClientes();
+			break;
+		case 3:
+			modificarClientes();
+			break;
+		case 4:
+			eliminarClientes();
+			break;
+		case 5:
+			buscarClientes();
+			break;
+		case 6:
+			freopen("TClientes.txt", "w", stdout);
+			mostrarClientes();
+			fclose(stdout);
+			system("TClientes.txt");
+			break;
+		}
+	}while(opc1!=0);
+}
+void mainCuentas(){
+	int opc2;
+	do{
+		cout << endl << "---------------------------------------";
+		cout << endl << "------- M E N U - C U E N T A S -------";
+		cout << endl << "---------------------------------------";
+		cout << endl << "1.- Adicionar: ";
+		cout << endl << "2.- Mostrar: ";
+		cout << endl << "3.- Modificar: ";
+		cout << endl << "4.- Eliminar: ";
+		cout << endl << "5.- Buscar: ";
+		cout << endl << "6.- Pasar a Archivo Texto: ";
+		cout << endl << "---------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc2);
+		switch(opc2){
+		case 1: 
+			addCuentas();
+			break;
+		case 2:
+			mostrarCuenta();
+			break;
+		case 3:
+			modificarCuenta();
+			break;
+		case 4:
+			eliminarCuenta();
+			break;
+		case 5:
+			buscarCuenta();
+			break;
+		case 6:
+			freopen("TCuenta.txt", "w", stdout);
+			mostrarCuenta();
+			fclose(stdout);
+			system("TCuenta.txt");
+			break;
+		}
+	}while(opc2!=0);
+}
+void mainSucursal(){
+	int opc3;
+	do{
+		cout << endl << "-----------------------------------------------";
+		cout << endl << "---------- M E N U - S U C U R S A L ----------";
+		cout << endl << "-----------------------------------------------";
+		cout << endl << "1.- Adicionar: ";
+		cout << endl << "2.- Mostrar: ";
+		cout << endl << "3.- Modificar: ";
+		cout << endl << "4.- Eliminar: ";
+		cout << endl << "5.- Buscar: ";
+		cout << endl << "6.- Pasar a Archivo Texto: ";
+		cout << endl << "-----------------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc3);
+		switch(opc3){
+		case 1: 
+			addSucursal();
+			break;
+		case 2:
+			mostrarSucursal();
+			break;
+		case 3:
+			modificarSucursal();
+			break;
+		case 4:
+			eliminarSucursal();
+			break;
+		case 5:
+			buscarSucursal();
+			break;
+		case 6:
+			freopen("TSucursal.txt", "w", stdout);
+			mostrarSucursal();
+			fclose(stdout);
+			system("TSucursal.txt");
+			break;
+		}
+	}while(opc3!=0);
+}
+void mainCajero(){
+	int opc4;
+	do{
+		cout << endl << "---------------------------------------";
+		cout << endl << "-------- M E N U - C A J E R O --------";
+		cout << endl << "---------------------------------------";
+		cout << endl << "1.- Adicionar: ";
+		cout << endl << "2.- Mostrar: ";
+		cout << endl << "3.- Modificar: ";
+		cout << endl << "4.- Eliminar: ";
+		cout << endl << "5.- Buscar: ";
+		cout << endl << "6.- Pasar a Archivo Texto: ";
+		cout << endl << "---------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc4);
+		switch(opc4){
+		case 1: 
+			addCajero();
+			break;
+		case 2:
+			mostrarCajeros();
+			break;
+		case 3:
+			modificarCajeros();
+			break;
+		case 4:
+			eliminarCajeros();
+			break;
+		case 5:
+			buscarCajeros();
+			break;
+		case 6:
+			freopen("TCajeros.txt", "w", stdout);
+			mostrarCajeros();
+			fclose(stdout);
+			system("TCajeros.txt");
+			break;
+		}
+	}while(opc4!=0);
+}
+void mainTransaccion(){
+	int opc5;
+	do{
+		cout << endl << "---------------------------------------------------";
+		cout << endl << "--------- M E N U - T R A N S A C C I O N ---------";
+		cout << endl << "---------------------------------------------------";
+		cout << endl << "1.- Adicionar: ";
+		cout << endl << "2.- Mostrar: ";
+		cout << endl << "3.- Modificar: ";
+		cout << endl << "4.- Eliminar: ";
+		cout << endl << "5.- Buscar: ";
+		cout << endl << "6.- Pasar a Archivo Tipo Texto: ";
+		cout << endl << "---------------------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc5);
+		switch(opc5){
+		case 1: 
+			addTransaccion();
+			break;
+		case 2:
+			mostrarTransaccion();
+			break;
+		case 3:
+			modificarTransaccion();
+			break;
+		case 4:
+			eliminarTransaccion();
+			break;
+		case 5:
+			buscarTransaccion();
+			break;
+		case 6:
+			freopen("TTransaccion.txt", "w", stdout);
+			mostrarTransaccion();
+			fclose(stdout);
+			system("TTransaccion.txt");
+			break;
+		}
+	}while(opc5!=0);
+}
+void mainReportes(){
+	int opc6;
+	do{
+		cout << endl << "-----------------------------------------";
+		cout << endl << "--------M E N U - R E P O R T E S--------";
+		cout << endl << "-----------------------------------------";
+		cout << endl << "1.- Extracto de Cuenta entre Fechas : ";
+		cout << endl << "2.- Extracto de Cuenta entre Fechas expresado en Dolares: ";
+		cout << endl << "3.- Ordenar Cliente Ascendente: ";
+		cout << endl << "4.- Cliente con mas transacciones: ";
+		cout << endl << "-----------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc6);
+		switch(opc6){
+		case 1: 
+		int id;
+			char fechaI[10],fechaF[10];
+			leer_numero("Ingrese el Id de Cuenta del cual desea obtener el extracto: ",id);
+			if(verificaridCuenta(id) == false){
+				do{
+					cout << endl << "Id no existe...";
+					cout << endl;
+					leer_numero("Ingresar un Id que exista: ",id);
+				}while(verificaridCuenta(id) == false);
+			}
+			// Fecha Inicio
+			cout << endl << "Ingrese la Fecha Inicial con formato (dd/mm/aa): ";
+			ingresarFecha(fechaI);
+			// Fecha Fin
+			cout << endl << "Ingrese la Fecha Final con formato (dd/mm/aa): ";
+			ingresarFecha(fechaF);
+			extractoDeCuentaEntreFechas(id,fechaI,fechaF);
+			break;
+		case 2:
+			leer_numero("Ingrese el Id de Cuenta del cual desea obtener el extracto: ",id);
+			if(verificaridCuenta(id) == false){
+				do{
+					cout << endl << "Id no existe...";
+					cout << endl;
+					leer_numero("Ingresar un Id que exista: ",id);
+				}while(verificaridCuenta(id) == false);
+			}
+			// Fecha Inicio
+			cout << endl << "Ingrese la Fecha Inicial con formato (dd/mm/aa): ";
+			ingresarFecha(fechaI);
+			// Fecha Fin
+			cout << endl << "Ingrese la Fecha Final con formato (dd/mm/aa): ";
+			ingresarFecha(fechaF);
+			extractoDeCuentaEntreFechasDolar(id,fechaI,fechaF);
+			break;
+		case 3:
+			ordenarClientes();
+			break;
+		case 4:
+			// Fecha Inicio
+			cout << endl << "Ingrese la Fecha Inicial con formato (dd/mm/aa): ";
+			ingresarFecha(fechaI);
+			// Fecha Fin
+			cout << endl << "Ingrese la Fecha Final con formato (dd/mm/aa): ";
+			ingresarFecha(fechaF);
+			listarClienteMasTransaccion(fechaI,fechaF);
+			break;
+		}
+	}while(opc6!=0);
+}
+void mainArchivoTexto(){
+	int opc7;
+	float tc, imp;
+	do{
+		cout << endl << "---------------------------------------------------";
+		cout << endl << "------- M E N U - A R C H I V O - T E X T O -------";
+		cout << endl << "---------------------------------------------------";
+		cout << endl << "1.- Adicionar: ";
+		cout << endl << "2.- Mostrar: ";
+		cout << endl << "---------------------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc7);
+		switch(opc7){
+		case 1: 
+			cout << endl << "Ingrese nuevo tipo de cambio: ";
+			cin >> tc;
+			cout << endl << "Ingrese nuevo valor para el impuesto: ";
+			cin >> imp;
+			addDatosConfig(tc,imp);
+			break;
+		case 2:
+			system("Config.txt");
+			mostrarArchivoTexto();
+			break;
+		}
+	}while(opc7 != 0);
+}
+// Menu Principal
+void main(){
+	int opc;
+	do{
+		cout << endl << "-------------------------------------------";
+		cout << endl << "------- M E N U - P R I N C I P A L -------";
+		cout << endl << "-------------------------------------------";
+		cout << endl << "1.- Clientes: ";
+		cout << endl << "2.- Cuentas: ";
+		cout << endl << "3.- Sucursal: ";
+		cout << endl << "4.- Cajeros: ";
+		cout << endl << "5.- Transaccion: ";
+		cout << endl << "6.- Reportes: ";
+		cout << endl << "7.- Archivo Texto: ";
+		cout << endl << "-------------------------------------------";
+		leer_numero("Seleccione una opcion: ",opc);
+		switch(opc){
+		case 1:
+			mainClientes();
+			break;
+		case 2:
+			mainCuentas();
+			break;
+		case 3:
+			mainSucursal();
+			break;
+		case 4:
+			mainCajero();
+			break;
+		case 5:
+			mainTransaccion();
+			break;
+		case 6:
+			mainReportes();
+			break;
+		case 7:
+			mainArchivoTexto();
+			break;
+		}
+	}while(opc!=0);
+}
