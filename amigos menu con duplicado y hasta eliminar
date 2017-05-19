@@ -252,24 +252,19 @@ int validarcodigo(int cod)
 {
 	FILE *ptr;
 	amigos reg;
-	int duplicado=0;
+	int dup=0;
 	ptr=fopen("amigos.dat","rb");
 	if(ptr==NULL)
-	{
-		cout<<"no existe el archivo"<<endl;
-	}
+		cout<<"No existe el archivo";
 	else
 	{
-		cout<<duplicado<<endl;
-		cout<<cod<<endl;
 		fread(&reg,sizeof(reg),1,ptr);
-		cout<<reg.codigo<<endl;
 		while(!feof(ptr))
 		{
-			if(cod==reg.codigo);
-				duplicado++;
-		fread(&reg,sizeof(reg),1,ptr);
+			if(cod==reg.codigo)
+				dup++;
+			fread(&reg,sizeof(reg),1,ptr);
 		}
 	}
-	return(duplicado);
+	return(dup);
 }
