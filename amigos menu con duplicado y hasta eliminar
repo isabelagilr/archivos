@@ -1,4 +1,4 @@
-// lalala.cpp : Defines the entry point for the console application.
+// yasss.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -10,11 +10,13 @@
 using namespace std;
 
 int obtenerpos(int cod);
+int validarcodigo(int cod);
 void adicionaramigos();
 void mostraramigos();
 void modificaramigos();
 void consultaamigo();
 void eliminaramigo();
+
 
 struct amigos{
 	int codigo;
@@ -83,24 +85,34 @@ void adicionaramigos()
 {
 	FILE *ptr;
 	amigos reg;
+	int cod,dupli;
 	ptr=fopen("amigos.dat","ab");
-	if(ptr==NULL)
-	{
-		cout<<"NO EXISTE EL ARCHIVO"<<endl;
-	}
-	else
-	{
-	cout<<"CODIGO:";
-	cin>>reg.codigo;
-	cout<<"Numero:";
-	cin>>reg.numero;
-	cout<<"EDAD:";
-	cin>>reg.edad;
-	reg.estado='S';
+		if(ptr==NULL)
+		{
+			cout<<"NO EXISTE EL ARCHIVO"<<endl;
+		}
+		else
+		{	
+			cout<<"CODIGO"<<endl;
+			cin>>reg.codigo;
+			dupli=validarcodigo(reg.codigo);
+			cout<<dupli;
+			if(dupli==0)
+			{
+			cout<<"Numero:";
+			cin>>reg.numero;
+			cout<<"EDAD:";
+			cin>>reg.edad;
+			reg.estado='S';
+			fwrite(&reg,sizeof(reg),1,ptr);
+			}
+			else
+			{
+				cout<<"ese codigo esta duplicado"<<endl;
+			}
+			fclose(ptr);
+		}
 	
-	fwrite(&reg,sizeof(reg),1,ptr);
-	fclose(ptr);
-	}
 }
 
 void mostraramigos(void)
@@ -234,4 +246,30 @@ void eliminaramigo()
 		}
 		fclose(ptr);
 	}
+}
+
+int validarcodigo(int cod)
+{
+	FILE *ptr;
+	amigos reg;
+	int duplicado=0;
+	ptr=fopen("amigos.dat","rb");
+	if(ptr==NULL)
+	{
+		cout<<"no existe el archivo"<<endl;
+	}
+	else
+	{
+		cout<<duplicado<<endl;
+		cout<<cod<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<reg.codigo<<endl;
+		while(!feof(ptr))
+		{
+			if(cod==reg.codigo);
+				duplicado++;
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	return(duplicado);
 }
