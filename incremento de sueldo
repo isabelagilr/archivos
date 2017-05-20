@@ -1,0 +1,306 @@
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include <string>
+#include "stdlib.h"
+
+
+using namespace std;
+
+int obtenerpos(int cod);
+int validarcod(int cod);
+float incrementarsueldo(float num);
+void add();
+void list();
+void mod();
+void cons();
+void elim();
+
+struct clientes
+{
+	int codigo;
+	int estado;
+	float numero;
+	int edad;
+	float nuevosueldo;
+};
+
+void main()
+{
+	int op;
+	do{
+	cout<<"************************"<<endl;
+	cout<<"             MENU"<<endl;
+	cout<<"1.- Adicionar cliente"<<endl;
+	cout<<"2.- Listado de clientes"<<endl;
+	cout<<"3.- Modificar cliente"<<endl;
+	cout<<"4.- Consultar cliente"<<endl;
+	cout<<"5.- Eliminar cliente"<<endl;
+	cout<<"0.- SALIR"<<endl;
+	cout<<"*************************"<<endl;
+	cout<<endl;
+	cout<<endl;
+	cout<<"INGRESE UNA OPCION"<<endl;
+	cin>>op;
+	switch(op)
+		{
+			case 1:
+			{
+				add();
+				break;
+			}
+			case 2:
+			{
+				list();
+				break;
+			}
+			case 3:
+			{
+				mod();
+				break;
+			}
+			case 4:
+			{
+				cons();
+				break;
+			}
+			case 5:
+			{
+				elim();
+				break;
+			}
+			case 0:
+			{
+				cout<<"SALIR"<<endl;
+				break;
+			}
+			default:
+			{
+				cout<<"ERROR, opcion invalida"<<endl;
+			}
+		}
+	}while(op!=0);
+	getch();
+}
+
+void add()
+{
+	FILE *ptr;
+	clientes reg;
+	int dupli;
+	ptr=fopen("clientes.dat","ab");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+
+		cout<<"CODIGO"<<endl;
+		cin>>reg.codigo;
+		dupli=validarcod(reg.codigo);
+		if(dupli==0)
+		{
+		cout<<"SUELDO"<<endl;
+		cin>>reg.numero;
+		reg.nuevosueldo=incrementarsueldo(reg.numero);
+		cout<<"EDAD"<<endl;
+		cin>>reg.edad;
+		reg.estado=9; //9 es que si esta presente
+		fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"el registro esta duplicado"<<endl;
+		}
+		fclose(ptr);
+	}
+}
+
+void list()
+{
+	FILE *ptr;
+	clientes reg;
+	ptr=fopen("clientes.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<"CODIGO         SUELDO      NUEVO SUELDO       EDAD "<<endl;
+		cout<<"---------------------------------------------------"<<endl;
+		while(!feof(ptr))
+		{
+			if(reg.estado==9)
+			{
+			cout<<reg.codigo<<"\t""\t"<<reg.numero<<"\t""\t"<<reg.nuevosueldo<<"\t""\t"<<reg.edad<<endl;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		cout<<"---------------------------------------------------"<<endl;
+		fclose(ptr);
+	}
+}
+
+void mod()
+{
+	FILE *ptr;
+	clientes reg;
+	int cod,pos;
+	ptr=fopen("clientes.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		list();
+		cout<<"ingrese el codigo del cliente que desea modificar:";
+		cin>>cod;
+		pos=obtenerpos(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estado==9)
+		{	
+			reg.codigo=cod;
+			cout<<"SUELDO"<<endl;
+			cin>>reg.numero;
+			reg.nuevosueldo=incrementarsueldo(reg.numero);
+			cout<<"EDAD"<<endl;
+			cin>>reg.edad;
+			reg.estado=9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		
+		fclose(ptr);
+	}
+}
+
+void cons()
+{
+	FILE *ptr;
+	clientes reg;
+	int cod,pos;
+	ptr=fopen("clientes.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		list();
+		cout<<"ingrese el codigo del cliente que desea consultar"<<endl;
+		cin>>cod;
+		list();
+		pos=obtenerpos(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<"CODIGO         SUELDO      NUEVO SUELDO       EDAD "<<endl;
+		cout<<"---------------------------------------------------"<<endl;
+		cout<<reg.codigo<<"\t""\t"<<reg.numero<<"\t""\t"<<reg.nuevosueldo<<"\t""\t"<<reg.edad<<endl;
+		cout<<"---------------------------------------------------"<<endl;
+		fclose(ptr);
+	}
+}
+
+int obtenerpos(int cod)
+{
+	FILE *ptr;
+	clientes reg;
+	int cont=0,pos;
+	ptr=fopen("clientes.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{	
+			cont++;
+			if(reg.codigo==cod)
+			{
+				pos=cont;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+
+void elim()
+{
+	FILE *ptr;
+	clientes reg;
+	int cod,pos;
+	ptr=fopen("clientes.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		list();
+		cout<<"ingrese el codigo del cliente que desea eliminar:";
+		cin>>cod;
+		pos=obtenerpos(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estado==9)
+		{reg.estado=0;
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+
+int validarcod(int cod)
+{
+	FILE *ptr;
+	clientes reg;
+	int dupli=0;
+	ptr=fopen("clientes.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{	
+			if(reg.codigo==cod)
+			{
+				dupli=1;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(dupli);
+}
+
+float incrementarsueldo(float num)
+{
+	FILE *ptr;
+	clientes reg;
+	float sueldo;
+	ptr=fopen("clientes.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+
+		if(num<=1500)
+		{			
+			sueldo=num*1.15;
+		}
+		if((num>1500)&&(num<=5000))
+		{
+			sueldo=num*1.12;
+		}
+		if((num>5000)&&(num<=10000))
+		{
+			sueldo=num*1.10;
+		}
+		if(num>10000)
+		{
+			sueldo=num*1.05;
+		}
+	
+	}
+	return(sueldo);
+}
