@@ -1,0 +1,583 @@
+// lalalal.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include <string>
+#include "stdlib.h"
+
+
+using namespace std;
+
+void mainProducto();
+void mainVentas();
+int obtenerposventas(int cod);
+int validarcodventas(int cod);
+void addventas();
+void listventas();
+void modventas();
+void consventas();
+void elimventas();
+int obtenerposprod(int cod);
+int validarcodprod(int cod);
+void addprod();
+void listprod();
+void modprod();
+void consprod();
+void elimprod();
+
+struct productos
+{
+	int codigo;
+	int estado;
+	float preciounit;
+	char nombre;
+};
+
+struct ventas
+{
+	int codigo;
+	int mes;
+	int dia;
+	int year;
+	int cantidad;
+	int codigoprod;
+	int estadoV;
+};
+void main()
+{
+	int op;
+	do{
+	cout<<"************************"<<endl;
+	cout<<"      MENU PRINCIPAL"<<endl;
+	cout<<"1.- PRODUCTOS"<<endl;
+	cout<<"2.- VENTAS"<<endl;
+	cout<<"*************************"<<endl;
+	cout<<endl;
+	cout<<endl;
+	cout<<"INGRESE UNA OPCION"<<endl;
+	cin>>op;
+	switch(op)
+		{
+			case 1:
+			{
+				mainProducto();
+				break;
+			}
+			case 2:
+			{
+				mainVentas();
+				break;
+			}
+			case 0:
+			{
+				cout<<"salir";
+				break;
+			}
+			default:
+			{
+				cout<<"ERROR, opcion invalida"<<endl;
+			}
+		}
+	}while(op!=0);
+	getch();
+}
+void mainProducto()
+{
+	int op;
+	do{
+	cout<<"************************"<<endl;
+	cout<<"      MENU PRODUCTOS"<<endl;
+	cout<<"1.- Adicionar"<<endl;
+	cout<<"2.- Listado"<<endl;
+	cout<<"3.- Modificar"<<endl;
+	cout<<"4.- Consultar"<<endl;
+	cout<<"5.- Eliminar"<<endl;
+	cout<<"0.- SALIR"<<endl;
+	cout<<"*************************"<<endl;
+	cout<<endl;
+	cout<<endl;
+	cout<<"INGRESE UNA OPCION"<<endl;
+	cin>>op;
+	switch(op)
+		{
+			case 1:
+			{
+				addprod();
+				break;
+			}
+			case 2:
+			{
+				listprod();
+				break;
+			}
+			case 3:
+			{
+				modprod();
+				break;
+			}
+			case 4:
+			{
+				consprod();
+				break;
+			}
+			case 5:
+			{
+				elimprod();
+				break;
+			}
+			case 0:
+			{
+				cout<<"SALIR"<<endl;
+				break;
+			}
+			default:
+			{
+				cout<<"ERROR, opcion invalida"<<endl;
+			}
+		}
+	}while(op!=0);
+	getch();
+}
+
+void mainVentas()
+{
+	int op;
+	do{
+	cout<<"************************"<<endl;
+	cout<<"      MENU VENTAS"<<endl;
+	cout<<"1.- Adicionar"<<endl;
+	cout<<"2.- Listado"<<endl;
+	cout<<"3.- Modificar"<<endl;
+	cout<<"4.- Consultar"<<endl;
+	cout<<"5.- Eliminar"<<endl;
+	cout<<"0.- SALIR"<<endl;
+	cout<<"*************************"<<endl;
+	cout<<endl;
+	cout<<endl;
+	cout<<"INGRESE UNA OPCION"<<endl;
+	cin>>op;
+	switch(op)
+		{
+			case 1:
+			{
+				addventas();
+				break;
+			}
+			case 2:
+			{
+				listventas();
+				break;
+			}
+			case 3:
+			{
+				modventas();
+				break;
+			}
+			case 4:
+			{
+				consventas();
+				break;
+			}
+			case 5:
+			{
+				elimventas();
+				break;
+			}
+			case 0:
+			{
+				cout<<"SALIR"<<endl;
+				break;
+			}
+			default:
+			{
+				cout<<"ERROR, opcion invalida"<<endl;
+			}
+		}
+	}while(op!=0);
+	getch();
+}
+
+void addventas()
+{
+	FILE *ptr;
+	ventas reg;
+	int dupli;
+	ptr=fopen("ventas.dat","ab");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+
+		cout<<"CODIGO"<<endl;
+		cin>>reg.codigo;
+		dupli=validarcodventas(reg.codigo);
+		if(dupli==0)
+		{
+		cout<<"codigo prod"<<endl;
+		cin>>reg.codigoprod;
+		cout<<"FECHA"<<endl;
+		cout<<"dia"<<endl;
+		cin>>reg.dia;
+		cout<<"mes"<<endl;
+		cin>>reg.mes;
+		cout<<"anho"<<endl;
+		cin>>reg.year;
+		cout<<"CANTIDAD"<<endl;
+		cin>>reg.cantidad;
+		reg.estadoV=9; //9 es que si esta presente
+		fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"el registro esta duplicado"<<endl;
+		}
+		fclose(ptr);
+	}
+}
+
+void listventas()
+{
+	FILE *ptr;
+	ventas reg;
+	ptr=fopen("ventas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<" CODIGO PROD         CODIGO VENTAS              FECHA               CANTIDAD  "<<endl;
+		cout<<"------------------------------------------------------------------------------"<<endl;
+		while(!feof(ptr))
+		{
+			if(reg.estadoV==9)
+			{
+			cout<<reg.codigoprod<<"\t""\t""\t"<<reg.codigo<<"\t""\t""\t"<<reg.dia<<"/"<<reg.mes<<"/"<<reg.year<<"\t""\t""\t"<<reg.cantidad<<endl;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		cout<<"------------------------------------------------------------------------------"<<endl;
+		fclose(ptr);
+	}
+}
+
+int validarcodventas(int cod)
+{
+	FILE *ptr;
+	ventas reg;
+	int dupli=0;
+	ptr=fopen("ventas.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{	
+			if(reg.codigo==cod)
+			{
+				dupli=1;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(dupli);
+}
+
+void modventas()
+{
+	FILE *ptr;
+	ventas reg;
+	int cod,pos;
+	ptr=fopen("ventas.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		cout<<"ingrese el codigo de la venta que desea modificar:";
+		cin>>cod;
+		pos=obtenerposventas(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estadoV==9)
+		{	
+			reg.codigo=cod;
+			cout<<"FECHA"<<endl;
+			cout<<"dia"<<endl;
+			cin>>reg.dia;
+			cout<<"mes"<<endl;
+			cin>>reg.mes;
+			cout<<"anho"<<endl;
+			cin>>reg.year;
+			cout<<"CANTIDAD"<<endl;
+			cin>>reg.cantidad;
+			cout<<"codigo prod"<<endl;
+			cin>>reg.codigoprod;
+			reg.estadoV=9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		
+		fclose(ptr);
+	}
+}
+
+void consventas()
+{
+	FILE *ptr;
+	ventas reg;
+	int cod,pos;
+	ptr=fopen("ventas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		listventas();
+		cout<<"ingrese el codigo de la venta que desea consultar"<<endl;
+		cin>>cod;
+		pos=obtenerposventas(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<" CODIGO PROD         CODIGO VENTAS              FECHA               CANTIDAD  "<<endl;
+		cout<<"------------------------------------------------------------------------------"<<endl;
+		cout<<reg.codigoprod<<"\t""\t""\t"<<reg.codigo<<"\t""\t""\t"<<reg.dia<<"/"<<reg.mes<<"/"<<reg.year<<"\t""\t""\t"<<reg.cantidad<<endl;
+		cout<<"------------------------------------------------------------------------------"<<endl;
+		fclose(ptr);
+	}
+}
+
+int obtenerposventas(int cod)
+{
+	FILE *ptr;
+	ventas reg;
+	int cont=0,pos;
+	ptr=fopen("ventas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{	
+			cont++;
+			if(reg.codigo==cod)
+			{
+				pos=cont;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+void elimventas()
+{
+	FILE *ptr;
+	ventas reg;
+	int cod,pos;
+	ptr=fopen("ventas.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		listventas();
+		cout<<"ingrese el codigo de la venta que desea eliminar:";
+		cin>>cod;
+		pos=obtenerposventas(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estadoV==9)
+		{reg.estadoV=0;
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+int obtenerposprod(int cod)
+{
+	FILE *ptr;
+	productos reg;
+	int cont=0,pos;
+	ptr=fopen("produtos.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{	
+			cont++;
+			if(reg.codigo==cod)
+			{
+				pos=cont;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+
+void elimprod()
+{
+	FILE *ptr;
+	productos reg;
+	int cod,pos;
+	ptr=fopen("productos.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		listventas();
+		cout<<"ingrese el codigo del cliente que desea eliminar:";
+		cin>>cod;
+		pos=obtenerposprod(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estado==9)
+		{reg.estado=0;
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+
+int validarcodprod(int cod)
+{
+	FILE *ptr;
+	productos reg;
+	int dupli=0;
+	ptr=fopen("productos.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{	
+			if(reg.codigo==cod)
+			{
+				dupli=1;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(dupli);
+}
+
+
+void addprod()
+{
+	FILE *ptr;
+	productos reg;
+	int dupli;
+	ptr=fopen("produtos.dat","ab");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+
+		cout<<"CODIGO"<<endl;
+		cin>>reg.codigo;
+		dupli=validarcodprod(reg.codigo);
+		if(dupli==0)
+		{
+		cout<<"NOMBRE"<<endl;
+		cin>>reg.nombre;
+		cout<<"PRECIO UNITARIO"<<endl;
+		cin>>reg.preciounit;
+		reg.estado=9; //9 es que si esta presente
+		fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"el registro esta duplicado"<<endl;
+		}
+		fclose(ptr);
+	}
+}
+
+void listprod()
+{
+	FILE *ptr;
+	productos reg;
+	ptr=fopen("produtos.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<"CODIGO         NOMBRE       PRECIO UNITARIO   "<<endl;
+		cout<<"----------------------------------------------"<<endl;
+		while(!feof(ptr))
+		{
+			if(reg.estado==9)
+			{
+			cout<<reg.codigo<<"\t""\t"<<reg.nombre<<"\t""\t"<<reg.preciounit<<endl;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		cout<<"-----------------------------------------------"<<endl;
+		fclose(ptr);
+	}
+}
+
+void modprod()
+{
+	FILE *ptr;
+	productos reg;
+	int cod,pos;
+	ptr=fopen("produtos.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		cout<<"ingrese el codigo del cliente que desea modificar:";
+		cin>>cod;
+		pos=obtenerposprod(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estado==9)
+		{	
+			reg.codigo=cod;
+			cout<<"NOMBRE"<<endl;
+			cin>>reg.nombre;
+			cout<<"PRECIO UNITARIO"<<endl;
+			cin>>reg.preciounit;
+			reg.estado=9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		
+		fclose(ptr);
+	}
+}
+
+void consprod()
+{
+	FILE *ptr;
+	productos reg;
+	int cod,pos;
+	ptr=fopen("produtos.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		listventas();
+		cout<<"ingrese el codigo del cliente que desea consultar"<<endl;
+		cin>>cod;
+		pos=obtenerposprod(cod);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<"CODIGO         NOMBRE       PRECIO UNITARIO   "<<endl;
+		cout<<"----------------------------------------------"<<endl;
+		cout<<reg.codigo<<"\t""\t"<<reg.nombre<<"\t""\t"<<reg.preciounit<<endl;
+		cout<<"----------------------------------------------"<<endl;
+		fclose(ptr);
+	}
+}
