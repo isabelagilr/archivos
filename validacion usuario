@@ -1,0 +1,1101 @@
+
+#include "stdafx.h"
+#include <iostream>
+#include <stdio.h>
+#include "conio.h"
+#include "stdlib.h"
+#include <string>
+#include <iomanip>
+#define N 40
+
+using namespace std;
+
+void addusuario();
+void addcliente_tractor();
+void addrev_revisado();
+void addencargado_tractor();
+void adddetalle_revision();
+void mostrarusuario();
+void mostrarcliente_tractor();
+void mostrarrev_revisado();
+void mostrarencargado_tractor();
+void mostrardetalle_revision();
+bool obtenerCE(int id,string dato);
+int obtenerPosicionUsuario(int id);
+int obtenerPosicionCT(int id);
+int obtenerPosicionRR(int id);
+int obtenerPosicionET(int id);
+int obtenerPosicionDR(int id);
+void modificarUsuario();
+void modificarCT();
+void modificarRR();
+void modificarET();
+void modificarDR();
+void eliminarUsuario();
+void eliminarCT();
+void eliminarRR();
+void eliminarET();
+void mostrarRevisiones();
+void mainIngreso();
+void mainAcceso();
+void mainCliente();
+void mainEncargado();
+
+struct usuario
+{
+	int idusuario;
+	string nombre;
+	string contrasena;
+	string ce;
+	int estado;
+};
+struct cliente_tractor
+{
+	int idusuario;
+	int id_tractor;
+	int modelo_tractor;
+	int estado;
+};
+struct rev_revisado
+{
+	int idrevrevisado;
+	int hrs_trabajadas;
+	int revision;
+	int operacion;
+	string detalle;
+	int hrs_faltantes;
+	int estado;
+};
+struct encargado_tractor
+{
+	int idusuario;
+	string marca;
+	int modelo_tractor;
+	int num_rev;
+	int estado;
+};
+struct detalle_revision 
+{
+	int id_detalle;
+	int modelo_tractor;
+	int revision;
+	int operacion;
+	string detalle;
+	int hora;
+};
+//Menu Principal
+void main()
+{
+	mainIngreso();
+	getch();
+}
+void mainIngreso()
+{
+	int opc1;
+	do{
+		cout << endl << "---------------------------------------";
+		cout << endl << "------------- A C C E S O -------------";
+		cout << endl << "---------------------------------------";
+		cout << endl << "1.- Acceder: ";
+		cout << endl << "2.- Registrarse: ";
+		cout << endl << "0.- Salir: ";
+		cout << endl << "---------------------------------------";
+		cout << endl << "Seleccione la Opcion que desea: ";
+		cin >> opc1;
+		switch(opc1)
+		{
+		case 1: 
+			mainAcceso();
+			break;
+		case 2:
+			addusuario();
+			mostrarusuario();
+			break;
+		}
+	}while(opc1!=0);
+}
+void mainAcceso()
+{
+	int id;
+	string dato;
+	FILE *ptr;
+	usuario reg;
+	cout << endl << "---------------------------------------";
+	cout << endl << "---------- Programa Tractores ---------";
+	cout << endl << "---------------------------------------";
+
+	cout << endl << "Usuario: ";
+	cin >> id;
+	cout << endl << "Contrasena: ";
+	do{
+		getline(cin, dato);
+	}while(dato.size()==0);
+	ptr = fopen("Usuarios.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(reg.idusuario == id)
+			{
+				if(reg.ce == "E")
+				{
+					mainEncargado();
+					fclose(ptr);
+				}
+				else
+				{
+				mainCliente();
+				fclose(ptr);
+				}
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	getch();
+}
+//anadiiiiiii esssstoooooo
+int validarusuario(int id)
+{
+	FILE *ptr;
+	usuario reg;
+	int dup=0;
+	ptr=fopen("usuarios.dat","rb");
+	if(ptr==NULL)
+		cout<<"No existe el archivo";
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(id==reg.idusuario)
+				{dup++;
+				fclose(ptr);
+				}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	return(dup);
+}
+
+void mainEncargado()
+{
+	int opc3;
+	do{
+		cout << endl << "-----------------------------------------";
+		cout << endl << "------- M E N U - E N C A R G A D O -----";
+		cout << endl << "-----------------------------------------";
+		cout << endl << "1.- Adicionar Tractor: ";
+		cout << endl << "2.- Mostrar Tractor: ";
+		cout << endl << "3.- Modificar Tractor: ";
+		cout << endl << "4.- Eliminar Tractor: ";
+		cout << endl << "5.- Listar Revisiones en base a modelo: ";
+		cout << endl << "6.- Mostrar Detalle Revision: ";
+		cout << endl << "7.- Modificar Detalle Revision: ";
+		cout << endl << "8.- Eliminar Detalle Revision: ";
+		cout << endl << "0.- Volver al Menu: ";
+		cout << endl << "-----------------------------------------";
+		cout << endl << "Seleccione una opcion: ";
+		cin >> opc3;
+		switch(opc3)
+		{
+		case 1: 
+			{
+			addencargado_tractor();
+			break;
+			}
+		case 2:
+			{
+			mostrarencargado_tractor();
+			break;
+			}
+		case 3:
+			{
+			modificarET();
+			break;
+			}
+		case 4:
+			{
+			eliminarET();
+			break;
+			}
+		case 5:
+			{
+			adddetalle_revision();
+			break;
+			}
+		case 6:
+			{
+			mostrardetalle_revision();
+			break;
+			}
+		case 7:
+			{modificarDR();
+			break;
+			}
+		case 8:
+			//eliminarDR();
+			break;
+		}
+	}while(opc3!=0);
+}
+
+void mainCliente()
+{
+	FILE *ptr;
+	detalle_revision reg;
+	int opc2;
+	do{
+		cout << endl << "-----------------------------------------";
+		cout << endl << "------- M E N U - C L I E N T E S -------";
+		cout << endl << "-----------------------------------------";
+		cout << endl << "1.- Adicionar Tractor: ";
+		cout << endl << "2.- Mostrar Tractor: ";
+		cout << endl << "3.- Modificar Tractor: ";
+		cout << endl << "4.- Eliminar Tractor: ";
+		cout << endl << "5.- Mostrar Revision: ";
+		cout << endl << "-----------------------------------------";
+		cout << endl << "Seleccione una opcion: ";
+		cin >> opc2;
+		switch(opc2)
+		{
+		case 1: 
+			{
+			addcliente_tractor();
+			break;
+			}
+		case 2:
+			{
+			mostrarcliente_tractor();
+			break;
+			}
+		case 3:
+			{
+			modificarCT();
+			break;
+			}
+		case 4:
+			{
+			eliminarCT();
+			break;
+			}
+		case 5:
+			{	
+			int id;
+			cout << endl << "Ingresar el modelo del tractor: ";
+			cin >> id;
+			ptr = fopen("Detalle_revision.dat","rb");
+			if(ptr != NULL)
+			{
+				fread(&reg, sizeof(reg),1,ptr);
+				while(!feof(ptr))
+				{
+					cout << endl << "-------------------------------------------------------------------------------------";
+					cout << endl << "Revision" << setw(10) << "Operacion" << setw(10) << "Detalle" << setw(10) << "Hora";
+					cout << endl << "-------------------------------------------------------------------------------------";
+					if(reg.modelo_tractor == id)
+					{
+						cout << endl << reg.revision << setw(10) << reg.operacion << setw(10) << reg.detalle << setw(10) << reg.hora;
+					}
+					fread(&reg,sizeof(reg),1,ptr);
+				}
+			}
+			fclose(ptr);
+			break;
+			}
+		}
+	}while(opc2!=0);	
+}
+
+//Adicionar
+void addusuario()
+{
+	FILE *ptr;
+	int dup,idusua;
+	ptr = fopen("Usuarios.dat","ab");
+	usuario reg;
+	cout << endl << "Ingresar un Id de Usuario: ";
+	cin >> idusua;
+	dup=validarusuario(idusua);
+	if(dup==1)
+		cout<<"este id de usuario ya existe";
+	else
+	{
+	reg.idusuario=idusua;
+	cout << endl << "Ingrese el nombre de usuario: ";
+	do{
+		getline(cin, reg.nombre);
+	}while(reg.nombre.size()==0);
+	cout << endl << "Ingrese la contrasena: ";
+	do{
+		getline(cin,reg.contrasena);
+	}while(reg.contrasena.size()==0);
+	cout << endl << "C / E ?: ";
+	do{
+		getline(cin,reg.ce);
+	}while(reg.ce.size()==0);
+	reg.estado = 0;
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	}
+	fclose(ptr);
+}
+void addcliente_tractor()
+{
+	FILE *ptr;
+	ptr = fopen("Cliente_tractor.dat","ab");
+	cliente_tractor reg;
+	cout << endl << "Ingresar un Id de Usuario: ";
+	cin >> reg.idusuario;
+	cout << endl << "Ingrese el idTractor: ";
+	cin >> reg.id_tractor;
+	cout << endl << "Ingrese el modelo tractor: ";
+	cin >> reg.modelo_tractor;
+	reg.estado = 0;
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void addrev_revisado()
+{
+	FILE *ptr;
+	ptr = fopen("Rev_revisado.dat","ab");
+	rev_revisado reg;
+	cout << endl << "Ingresar un Id de revisado: ";
+	cin >> reg.idrevrevisado;
+	cout << endl << "Ingrese las horas trabajadas: ";
+	cin >> reg.hrs_trabajadas;
+	cout << endl << "Ingrese la revision: ";
+	cin >> reg.revision;
+	cout << endl << "Ingrese la operacion: ";
+	cin >> reg.operacion;
+	cout << endl << "Ingrese el detalle: ";
+	do{
+	getline(cin, reg.detalle);
+	}while(reg.detalle.size()==0);
+	cout << endl << "Ingrese horas faltantes: ";
+	cin >> reg.hrs_faltantes;
+	reg.estado = 0;
+	
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void addencargado_tractor()
+{
+	FILE *ptr;
+	ptr = fopen("Encargado_tractor.dat","ab");
+	encargado_tractor reg;
+	cout << endl << "Ingresar un Id de Usuario: ";
+	cin >> reg.idusuario;
+	cout << endl << "Ingrese la marca: ";
+	do{
+		getline(cin,reg.marca);
+	}while(reg.marca.size()==0);
+	cout << endl << "Ingrese el modelo tractor: ";
+		cin >> reg.modelo_tractor;
+	cout << endl << "Ingrese numero de revisiones: ";
+	cin >> reg.num_rev;
+	reg.estado = 0;
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+void adddetalle_revision()
+{
+	FILE *ptr;
+	ptr = fopen("Detalle_revision.dat","ab");
+	detalle_revision reg;
+	cout << endl << "Ingresar un Id de detalle: ";
+	cin >> reg.id_detalle;
+	cout << endl << "Ingrese el modelo tractor: ";
+	cin >> reg.modelo_tractor;
+	cout << endl << "Ingrese revision: ";
+	cin >> reg.revision;
+	cout << endl << "Ingresar una operacion: ";
+	cin >> reg.operacion;
+	cout << endl << "Ingrese detalle: ";
+	do{
+		getline(cin,reg.detalle);
+	}while(reg.detalle.size()==0);
+	cout << endl << "Ingresar hora: ";
+	cin >> reg.hora;
+	fwrite(&reg, sizeof(reg), 1, ptr);
+	fclose(ptr);
+}
+//Mostrar - Falta RevRevision
+void mostrarusuario()
+{
+	FILE *ptr;
+	usuario reg;
+	ptr = fopen("Usuarios.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "---------------------------- LISTADO DE CLIENTES ----------------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id usuario" << setw(16) << "Nombre" << setw(12) << "contrase�a" << setw(18) << "C/E";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr))
+		{
+			if(reg.estado == 0)
+			{
+				cout << endl << setw(5) << reg.idusuario << setw(20) << reg.nombre<< setw(12) << reg.contrasena<< setw(25) << reg.ce;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}
+	else
+	{
+		cout << "No existe el Archivo";
+	}
+	fclose(ptr);
+}
+void mostrarcliente_tractor()
+{
+	FILE *ptr;
+	cliente_tractor reg;
+	ptr = fopen("Cliente_tractor.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "--------------------------- LISTADO DE CLIENTE_Tractor ----------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id usuario" << setw(16) << "Id Tractor" << setw(12) << "Modelo_tractor";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr))
+		{
+			if(reg.estado == 0)
+			{
+				cout << endl << setw(5) << reg.idusuario << setw(20) << reg.id_tractor<< setw(12) << reg.modelo_tractor;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}
+	else
+	{
+		cout << "No existe el Archivo";
+	}
+	fclose(ptr);
+}
+void mostrarrev_revisado()
+{
+	FILE *ptr;
+	rev_revisado reg;
+	ptr = fopen("Rev_revisado.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "--------------------------- LISTADO DE Rev Revisado ----------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id RevRevisado" << setw(16) << "Hrs Trabajadas" << setw(12) << "Revision" << setw(12) << "Operacion" << setw(12) << "Detalle" << setw(12) << "Hrs. Faltantes";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr))
+		{
+			if(reg.estado == 0)
+			{
+				cout << endl << setw(5) << reg.idrevrevisado << setw(20) << reg.hrs_trabajadas << setw(12) << reg.revision << setw(12) << reg.operacion << setw(12) << reg.detalle << setw(12) << reg.hrs_faltantes;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}
+	else
+	{
+		cout << "No existe el Archivo";
+	}
+	fclose(ptr);
+}
+void mostrarencargado_tractor()
+{
+	FILE *ptr;
+	encargado_tractor reg;
+	ptr = fopen("Encargado_tractor.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "--------------------------- LISTADO DE encargado_tractor ---------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id usuario" << setw(16) << "Marca" << setw(12) << "Modelo_tractor"<< setw(12) << "Num_rev";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr))
+		{
+			if(reg.estado == 0)
+			{
+				cout << endl << setw(5) << reg.idusuario << setw(20) << reg.marca<< setw(12) << reg.modelo_tractor<< setw(12) << reg.num_rev;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}
+	else
+	{
+		cout << "No existe el Archivo";
+	}
+	fclose(ptr);
+}
+void mostrardetalle_revision()
+{
+	FILE *ptr;
+	detalle_revision reg;
+	ptr = fopen("Detalle_revision.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "--------------------------- LISTADO DE detalle_revision ----------------------";
+		cout << endl << "-----------------------------------------------------------------------------";
+		cout << endl << "Id detalle" << setw(16) << "Modelo_tractor" << setw(12) << "revision" << setw(12) << "Operacion"<< setw(12) << "Detalle"<< setw(12) << "Hora";
+		cout << endl << "-----------------------------------------------------------------------------";
+		while(!feof(ptr))
+		{
+			cout << endl << setw(5) << reg.id_detalle << setw(20) << reg.modelo_tractor << setw(12) << reg.revision << setw(12) << reg.operacion << setw(12) << reg.detalle << setw(12) << reg.hora;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		cout << endl << "-----------------------------------------------------------------------------";
+	}
+	else
+	{
+		cout << "No existe el Archivo";
+	}
+	fclose(ptr);
+}
+//Obtener Posicion - Para modificar y eliminar
+bool obtenerCE(int id,string dato)
+{
+	FILE *ptr;
+	usuario reg;
+	bool k = false;
+	ptr = fopen("Usuarios.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		if(id == reg.idusuario)
+		{
+			if(reg.ce == "E")
+			{
+				k = true;
+			}
+		}
+	}
+	else
+	{
+		cout << endl << "El archivo no existe";
+	}
+	fclose(ptr);
+	return(k);
+}
+int obtenerPosicionUsuario(int id)
+{
+	FILE *ptr;
+	usuario reg;
+	int cont = 0, pos;
+	ptr = fopen("Usuarios.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(reg.idusuario == id)
+			{
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	fclose(ptr);
+	return(pos);
+}
+int obtenerPosicionCT(int id)
+{
+	FILE *ptr;
+	cliente_tractor reg;
+	int cont = 0, pos;
+	ptr = fopen("Cliente_tractor.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(reg.id_tractor == id)
+			{
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionRR(int id)
+{
+	FILE *ptr;
+	rev_revisado reg;
+	int cont = 0, pos;
+	ptr = fopen("Rev_revisado.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(reg.idrevrevisado == id)
+			{
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionET(int id)
+{
+	FILE *ptr;
+	encargado_tractor reg;
+	int cont = 0, pos;
+	ptr = fopen("Encargado_tractor.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(reg.idusuario == id)
+			{
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+int obtenerPosicionDR(int id)
+{
+	FILE *ptr;
+	detalle_revision reg;
+	int cont = 0, pos;
+	ptr = fopen("Detalle_revision.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(reg.id_detalle == id)
+			{
+				pos = cont;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+//Modificar
+void modificarUsuario()
+{
+	FILE *ptr;
+	usuario reg;
+	int id, pos;
+	mostrarusuario();
+	cout << "Ingrese el Id de usuario que desea modificar: ";
+	cin >> id;
+	pos = obtenerPosicionUsuario(id);
+	ptr = fopen("Usuarios.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.idusuario = id;
+			cout << endl << "Ingrese el nombre: ";
+			do{
+				getline(cin,reg.nombre);
+			}while(reg.nombre.size() == 0);
+			cout << endl << "Ingrese contrase�a: ";
+			do{
+				getline(cin,reg.contrasena);
+			}while(reg.contrasena.size() == 0);
+			reg.estado = 0;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarCT()
+{
+	FILE *ptr;
+	cliente_tractor reg;
+	int id, pos;
+	mostrarcliente_tractor();
+	cout << "Ingrese el id de tractor que desea modificar: ";
+	cin >> id;
+	pos = obtenerPosicionCT(id);
+	ptr = fopen("Cliente_tractor.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.id_tractor = id;
+			cout << endl << "Ingrese el modelo: ";
+			cin >> reg.modelo_tractor;
+			reg.estado = 0;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarRR()
+{
+	FILE *ptr;
+	rev_revisado reg;
+	int id, pos;
+	//mostrarrev_revisado();
+	cout << "Ingrese el id de rev revisado: ";
+	cin >> id;
+	pos = obtenerPosicionCT(id);
+	ptr = fopen("Rev_revisado.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.idrevrevisado = id;
+			cout << endl << "Ingrese horas trabajadas: ";
+			cin >> reg.hrs_trabajadas;
+			cout << endl << "Ingrese revision: ";
+			cin >> reg.revision;
+			cout << endl << "Ingrese la operacion: ";
+			cin >> reg.operacion;
+			cout << endl << "Ingrese el detalle: ";
+			do{
+				getline(cin,reg.detalle);
+			}while(reg.detalle.size() == 0);
+			cout << endl << "Ingrese las horas faltantes: ";
+			cin >> reg.hrs_faltantes;
+			reg.estado = 0;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarET()
+{
+	FILE *ptr;
+	encargado_tractor reg;
+	int id, pos;
+	mostrarencargado_tractor();
+	cout << "Ingrese el id de usuario: ";
+	cin >> id;
+	pos = obtenerPosicionET(id);
+	ptr = fopen("Encargado_tractor.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.idusuario = id;
+			do{
+				getline(cin,reg.marca);
+			}while(reg.marca.size() == 0);
+			cout << endl << "Ingrese modelo tractor: ";
+			cin >> reg.modelo_tractor;
+			cout << endl << "Ingrese num_rev: ";
+			cin >> reg.num_rev;
+			reg.estado = 0;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+void modificarDR()
+{
+	FILE *ptr;
+	detalle_revision reg;
+	int id, pos;
+	mostrardetalle_revision();
+	cout << "Ingrese el id de detalle: ";
+	cin >> id;
+	pos = obtenerPosicionDR(id);
+	ptr = fopen("Detalle_revision.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr))
+		{
+			reg.id_detalle = id;
+			cout << endl << "Ingrese modelo tractor: ";
+			cin >> reg.modelo_tractor;
+			cout << endl << "Ingrese revision: ";
+			cin >> reg.revision;
+			cout << endl << "Ingrese operacion: ";
+			cin >> reg.operacion;
+			do{
+				getline(cin,reg.detalle);
+			}while(reg.detalle.size() == 0);
+			cout << endl << "Ingrese hora: ";
+			cin >> reg.hora;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+//Buscar
+void buscarUsuario()
+{
+	FILE *ptr;
+	usuario reg;
+	int id,pos;
+	cout << "Ingrese el Id usuario que desea buscar: ";
+	cin >> id;
+	pos = obtenerPosicionUsuario(id);
+	ptr = fopen("Usuarios.dat","rb");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+				cout << endl << "-------------------------------------------";
+				cout << endl << setw(5) << reg.idusuario << setw(15) << reg.nombre << setw(15) << reg.contrasena << setw(15) << reg.ce;
+				cout << endl << "-------------------------------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarCT()
+{
+	FILE *ptr;
+	cliente_tractor reg;
+	int id,pos;
+	cout << "Ingrese el Id tractor que desea buscar: ";
+	cin >> id;
+	pos = obtenerPosicionCT(id);
+	ptr = fopen("Cliente_tractor.dat","rb");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+				cout << endl << "-------------------------------------------";
+				cout << endl << setw(5) << reg.idusuario << setw(15) << reg.id_tractor << setw(15) << reg.modelo_tractor;
+				cout << endl << "-------------------------------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarRR()
+{
+	FILE *ptr;
+	rev_revisado reg;
+	int id,pos;
+	cout << "Ingrese el Id revisado que desea buscar: ";
+	cin >> id;
+	pos = obtenerPosicionRR(id);
+	ptr = fopen("Rev_revisado.dat","rb");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			cout << endl << "-------------------------------------------";
+			cout << endl << setw(5) << reg.idrevrevisado << setw(15) << reg.hrs_trabajadas << setw(15) << reg.revision << setw(15) << reg.operacion << setw(15) << reg.detalle<< setw(15) << reg.hrs_faltantes;
+			cout << endl << "-------------------------------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarET()
+{
+	FILE *ptr;
+	encargado_tractor reg;
+	int id,pos;
+	cout << "Ingrese el Id usuario que desea buscar: ";
+	cin >> id;
+	pos = obtenerPosicionET(id);
+	ptr = fopen("Encargado_tractor.dat","rb");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			cout << endl << "-------------------------------------------";
+			cout << endl << setw(5) << reg.idusuario << setw(15) << reg.marca << setw(15) << reg.modelo_tractor << setw(15) << reg.num_rev;
+			cout << endl << "-------------------------------------------";
+		}
+	}
+	fclose(ptr);
+}
+void buscarDR()
+{
+	FILE *ptr;
+	detalle_revision reg;
+	int id,pos;
+	cout << "Ingrese el Id detalle que desea buscar: ";
+	cin >> id;
+	pos = obtenerPosicionDR(id);
+	ptr = fopen("Detalle_revision.dat","rb");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr))
+		{
+			cout << endl << "-------------------------------------------";
+			cout << endl << setw(5) << reg.id_detalle << setw(15) << reg.modelo_tractor << setw(15) << reg.revision << setw(15) << reg.operacion << setw(15) << reg.detalle << setw(15) << reg.hora;
+			cout << endl << "-------------------------------------------";
+		}
+	}
+	fclose(ptr);
+}
+//Eliminar
+void eliminarUsuario()
+{
+	FILE *ptr;
+	usuario reg;
+	int id,pos;
+	cout << endl << "Ingrese el Id del Cliente que desea eliminar: ";
+	cin >> id;
+	pos = obtenerPosicionUsuario(id);
+	ptr = fopen("Usuarios.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.estado = 9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	else
+	{
+		cout << endl << "No se puede Eliminar";
+	}
+	fclose(ptr);
+}
+void eliminarCT()
+{
+	FILE *ptr;
+	cliente_tractor reg;
+	int id,pos;
+	cout << endl << "Ingrese el Id del tractor que desea eliminar: ";
+	cin >> id;
+	pos = obtenerPosicionCT(id);
+	ptr = fopen("Cliente_tractor.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.estado = 9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	else
+	{
+		cout << endl << "No se puede Eliminar";
+	}
+	fclose(ptr);
+}
+void eliminarRR()
+{
+	FILE *ptr;
+	rev_revisado reg;
+	int id,pos;
+	cout << endl << "Ingrese el Id de revisado desea eliminar: ";
+	cin >> id;
+	pos = obtenerPosicionRR(id);
+	ptr = fopen("Rev_revisado.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.estado = 9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	else
+	{
+		cout << endl << "No se puede Eliminar";
+	}
+	fclose(ptr);
+}
+void eliminarET()
+{
+	FILE *ptr;
+	encargado_tractor reg;
+	int id,pos;
+	cout << endl << "Ingrese el Id de usuario que desea eliminar: ";
+	cin >> id;
+	pos = obtenerPosicionET(id);
+	ptr = fopen("Encargado_tractor.dat","r+b");
+	if(ptr != NULL)
+	{
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado == 0)
+		{
+			reg.estado = 9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	else
+	{
+		cout << endl << "No se puede Eliminar";
+	}
+	fclose(ptr);
+}
+void mostrarRevisiones()
+{
+	FILE *ptr;
+	detalle_revision reg;
+	int id;
+	cout << endl << "Ingresar el modelo del tractor: ";
+	cin >> id;
+	ptr = fopen("Detalle_revision.dat","rb");
+	if(ptr != NULL)
+	{
+		fread(&reg, sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cout << endl << "-------------------------------------------------------------------------------------";
+			cout << endl << "Revision" << setw(10) << "Operacion" << setw(10) << "Detalle" << setw(10) << "Hora";
+			cout << endl << "-------------------------------------------------------------------------------------";
+			if(reg.modelo_tractor == id)
+			{
+				cout << endl << reg.revision << setw(10) << reg.operacion << setw(10) << reg.detalle << setw(10) << reg.hora;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		}
+	}
+	fclose(ptr);
+}				
