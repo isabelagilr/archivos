@@ -1,0 +1,242 @@
+// apa.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <string>
+#include <iomanip>
+#define max 100
+
+using namespace std;
+
+int verificarid(int carnet);
+void adicionar();
+void mostrar();
+int obtenerpos(int carnet);
+void modificar();
+void eliminarfis();
+
+
+struct personas{
+	int id;
+	char sexo;
+	int estado;
+};
+
+void main()
+{
+	int op;
+	do{
+	cout<<"      menu"<<endl;
+	cout<<"(1) adicionar"<<endl;
+	cout<<"(2) mostrar"<<endl;
+	cout<<"(3) modificar"<<endl;
+	cout<<"(4) eliminar fisicamente"<<endl;
+	cout<<"(0) SALIR"<<endl;
+	cout<<endl;
+	cout<<"ingrese una opcion"<<endl;
+	cin>>op;
+	switch(op)
+	{
+	case 1:
+		{
+			adicionar();
+			break;
+		}
+	case 2:
+		{
+			mostrar();
+			break;
+		}
+	case 3:
+		{
+			modificar();
+			break;
+		}
+	case 4:
+		{
+			eliminarfis();
+			break;
+		}
+	case 0:
+		{
+			cout<<"SALIR"<<endl;
+			break;
+		}
+	default:
+		{
+			cout<<"opcion invalida"<<endl;
+			break;
+		}
+	}
+	}while(op!=0);
+getch();
+}
+
+
+void adicionar()
+{
+	FILE *ptr;
+	int carnet,dupli;
+	personas reg;
+	ptr=fopen("personas.dat","ab");
+	if(ptr==NULL)
+		cout<<"no existe el archivo";
+	else
+	{
+		do{
+		cout<<"ingrese carnet"<<endl;;
+		cin>>carnet;
+		dupli=verificarid(carnet);
+		if(dupli!=0)
+		{
+			cout<<"carnet repetido"<<endl;
+		}
+		}while(dupli!=0);
+		reg.id=carnet;
+		reg.estado=0;
+		do{
+		cout<<"GENERO (F o M)"<<endl;
+		 reg.sexo=toupper(getche()); 
+		}while(reg.sexo!='M' && reg.sexo!='F');
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+}
+void mostrar()
+{
+	FILE *ptr;
+	int carnet,dupli;
+	personas reg;
+	ptr=fopen("personas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo";
+	else
+	{
+		cout<<"CARNET         SEXO  "<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(reg.estado==0)
+			{
+				cout<<reg.id<<"\t""\t"<<reg.sexo<<endl;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+	fclose(ptr);
+	}
+	
+}
+void modificar()
+{
+	FILE *ptr;
+	int carnet,pos,dupli;
+	personas reg;
+	ptr=fopen("personas.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo";
+	else
+	{
+		cout<<"ingrese el carnet de la persona que desea modificar"<<endl;
+		cin>>carnet;
+		pos=obtenerpos(carnet);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		reg.estado=0;
+		do{
+		cout<<"GENERO (F o M)"<<endl;
+		 reg.sexo=toupper(getche()); 
+		}while(reg.sexo!='M' && reg.sexo!='F');
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+}
+void eliminarfis()
+{
+	
+	FILE *ptr;
+	personas reg, vec[max];
+	int tamv=0,carnet;
+	ptr=fopen("personas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo";
+	else
+	{
+		cout<<"ingrese el carnet que desea eliminar"<<endl;
+		cin>>carnet;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(reg.id!=carnet)
+			{	
+				vec[tamv]=reg;
+				tamv++;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+		fopen("personas.dat","wb");
+
+		for(int i=0;i<tamv;i++)
+		{
+			reg.id=vec[i].id;
+			reg.estado=vec[i].estado;
+			reg.sexo=vec[i].sexo;
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+	fclose(ptr);
+	}
+}
+
+int verificarid(int carnet)
+{
+	FILE *ptr;
+	personas reg;
+	int dupli=0;
+	ptr=fopen("personas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo";
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(carnet==reg.id)
+			{
+				dupli=1;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+	fclose(ptr);
+	return(dupli);
+	}
+}
+
+
+int obtenerpos(int carnet)
+{
+	FILE *ptr;
+	personas reg;
+	int cont=0;
+	int pos;
+	ptr=fopen("personas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo";
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(reg.id==carnet)
+			{
+				pos=cont;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+	fclose(ptr);
+	}
+	return(pos);
+}
