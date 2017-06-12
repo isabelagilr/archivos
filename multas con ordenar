@@ -1,0 +1,374 @@
+
+#include "stdafx.h"
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include <string>
+#define max 10
+
+using namespace std;
+
+ struct multas{
+	 int id_denuncia;
+	 int placa;
+	 int ci;
+	 int dia;
+	 int mes;
+	 int anho;
+	 int estado;
+ };
+
+ void add();
+ int obtenerpos(int id);
+ void listado();
+ void modificar();
+ void ordenar_mayor_menor();
+ void consultar();
+ void elimLOG();
+ void elimFIS();
+
+void main()
+{
+	int op;
+	do{
+	cout<<"       MENU"<<endl;
+	cout<<"(1) adicionar"<<endl;
+	cout<<"(2) listado"<<endl;
+	cout<<"(3) modificar"<<endl;
+	cout<<"(4) consultar"<<endl;
+	cout<<"(5) eliminar"<<endl;
+	cout<<"(6) eliminar fisico"<<endl;
+	cout<<"(7) ordenar de mayor a menor segun id denuncia"<<endl;
+	cout<<"(0) salir"<<endl;
+	cout<<endl;
+	cout<<"INGRESE UNA OPCION"<<endl;
+	cin>>op;
+	cout<<endl;
+	cout<<endl;
+	switch(op)
+	{
+	case 1:
+		{
+			add();
+			break;
+		}
+	case 2:
+		{
+			listado();
+			break;
+		}
+	case 3:
+		{
+			modificar();
+			break;
+		}
+	case 4:
+		{
+			consultar();
+			break;
+		}
+	case 5:
+		{
+			elimLOG();
+			break;
+		}
+	case 6:
+		{
+			elimFIS();
+			break;
+		}
+	case 7:
+		{
+			ordenar_mayor_menor();
+			listado();
+			break;
+		}
+	case 0:
+		{
+			cout<<"SALIR";
+			break;
+		}
+	default:
+		{
+			cout<<"OPCION INVALIDA"<<endl;
+			break;
+		}
+	}
+	}while(op!=0);
+	getch();
+}
+ void add()
+ {
+	 multas reg;
+	 FILE *ptr;
+	 ptr=fopen("multas.dat","ab");
+	 if(ptr==NULL)
+		 cout<<"no existe el archivo"<<endl;
+	 else
+	 {
+		 cout<<"ingrese el id de la denuncia"<<endl;
+		 cin>>reg.id_denuncia;
+		 cout<<"ingrese la placa"<<endl;
+		 cin>>reg.placa;
+		 cout<<"ingrese CI de la persona"<<endl;
+		 cin>>reg.ci;
+		 cout<<"ingrese la fecha en: dia/mes/anho"<<endl;
+		 cin>>reg.dia;
+		 cin>>reg.mes;
+		 cin>>reg.anho;
+		 reg.estado=9;
+		 fwrite(&reg,sizeof(reg),1,ptr);
+		 fclose(ptr);
+	 }
+ }
+ void listado()
+ {
+	 multas reg;
+	 FILE *ptr;
+	 ptr=fopen("multas.dat","rb");
+	 if(ptr==NULL)
+		 cout<<"no existe el archivo"<<endl;
+	 else
+	 {
+		 cout<<"ID DENUNCIA     PLACA             CI             FECHA"<<endl;
+		 cout<<"--------------------------------------------------------"<<endl;
+		 fread(&reg,sizeof(reg),1,ptr);
+		 while(!feof(ptr))
+		 {
+			if(reg.estado==9)
+			{
+				cout<<reg.id_denuncia<<"\t""\t"<<reg.placa<<"\t""\t"<<reg.ci<<"\t""\t"<<reg.dia<<"/"<<reg.mes<<"/"<<reg.anho<<endl;
+			}
+			fread(&reg,sizeof(reg),1,ptr);
+		 }
+		 cout<<"--------------------------------------------------------"<<endl;
+		 fclose(ptr);
+	 }
+
+ }
+ void modificar()
+{
+	int id,pos;
+	multas reg;
+	FILE *ptr;
+	ptr=fopen("multas.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		listado();
+		cout<<"Ingrese el id de la denuncia que desea modificar"<<endl;
+		cin>>id;
+		pos=obtenerpos(id);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr)&&reg.estado==9)
+		{
+			reg.id_denuncia=id;
+			cout<<"ingrese la placa"<<endl;
+			cin>>reg.placa;
+			cout<<"ingrese CI de la persona"<<endl;
+			cin>>reg.ci;
+			cout<<"ingrese la fecha en: dia/mes/anho"<<endl;
+			cin>>reg.dia;
+			cin>>reg.mes;
+			cin>>reg.anho;
+			reg.estado=9;
+			fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+ }
+ void consultar()
+{
+	multas reg;
+	int id,pos;
+	FILE *ptr;
+	ptr=fopen("multas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	 {
+		listado();
+		cout<<"Ingrese el id de la denuncia que desea consultar"<<endl;
+		cin>>id;
+		pos=obtenerpos(id);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		cout<<"ID DENUNCIA     PLACA             CI             FECHA"<<endl;
+		cout<<"--------------------------------------------------------"<<endl;
+		cout<<reg.id_denuncia<<"\t""\t"<<reg.placa<<"\t""\t"<<reg.ci<<"\t""\t"<<reg.dia<<"/"<<reg.mes<<"/"<<reg.anho<<endl;
+		cout<<"--------------------------------------------------------"<<endl;
+		fclose(ptr);
+
+	 }
+
+}
+ void elimLOG()
+{
+	int id,pos;
+	multas reg;
+	FILE *ptr;
+	ptr=fopen("multas.dat","r+b");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		listado();
+		cout<<"Ingrese el id de la denuncia que desea eliminar"<<endl;
+		cin>>id;
+		pos=obtenerpos(id);
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);
+		if(!feof(ptr) && reg.estado==9)
+			{
+				reg.estado=1;
+			}
+		fseek(ptr,(pos-1)*sizeof(reg),SEEK_SET);
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+
+}
+
+int obtenerpos(int id)
+{
+	int pos,cont=0;
+	multas reg;
+	FILE *ptr;
+	ptr=fopen("multas.dat","rb");
+	if(ptr==NULL)
+		cout<<"no existe el archivo"<<endl;
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			cont++;
+			if(id==reg.id_denuncia)
+			{
+				pos=cont;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+	return(pos);
+}
+
+
+void elimFIS()
+{
+	int id,i=0;
+	FILE *ptr;
+	multas reg,vec[max];
+	ptr=fopen("multas.dat","r+b");
+	if(ptr==NULL)
+	{
+		cout<<"no existe el archivo"<<endl;
+	}
+	else
+	{
+		cout<<"ingrese el id de denuncia que quiere eliminar"<<endl;
+		cin>>id;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(id!=reg.id_denuncia)
+			{
+				vec[i]=reg;
+				i++;
+			}
+		fread(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+		fopen("multas.dat","wb");
+		for(int j=0;j<i;j++)
+		{
+			reg.id_denuncia=vec[j].id_denuncia;
+			reg.anho=vec[j].anho;
+			reg.ci=vec[j].ci;
+			reg.dia=vec[j].dia;
+			reg.mes=vec[j].mes;
+			reg.placa=vec[j].placa;
+			reg.estado=vec[j].estado;
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
+
+void ordenar_mayor_menor()
+{
+	int i=0;
+	int aux,aux1,aux2,aux3,aux4,aux5,aux6;
+	FILE *ptr;
+	multas reg,vec[max];
+	ptr=fopen("multas.dat","rb");
+	if(ptr==NULL)
+	{
+		cout<<"no existe el archivo"<<endl;
+	}
+	else
+	{
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			vec[i]=reg;
+			i++;
+		}
+		fread(&reg,sizeof(reg),1,ptr);
+
+		for(int j=0;j<i-1;j++)
+		{	
+			for(int k=j+1;k<i;k++)
+			{
+				if(vec[k].id_denuncia>vec[j].id_denuncia)
+				{
+				aux=vec[j].id_denuncia;
+				vec[j].id_denuncia=vec[k].id_denuncia;
+				vec[k].id_denuncia=aux;
+
+				aux1=vec[j].mes;
+				vec[j].mes=vec[k].mes;
+				vec[k].mes=aux1;
+
+				aux2=vec[j].dia;
+				vec[j].dia=vec[k].dia;
+				vec[k].dia=aux2;
+
+				aux3=vec[j].anho;
+				vec[j].anho=vec[k].anho;
+				vec[k].anho=aux3;
+
+				aux5=vec[j].ci;
+				vec[j].ci=vec[k].ci;
+				vec[k].ci=aux5;
+
+				aux4=vec[j].placa;
+				vec[j].placa=vec[k].placa;
+				vec[k].placa=aux4;
+
+				aux6=vec[j].estado;
+				vec[j].estado=vec[k].estado;
+				vec[k].estado=aux6;
+				}
+			}
+		}
+		fclose(ptr);
+		ptr=fopen("multas.dat","wb");
+		for(int j=0;j<i;j++)
+		{
+			reg.id_denuncia=vec[j].id_denuncia;
+			reg.anho=vec[j].anho;
+			reg.ci=vec[j].ci;
+			reg.dia=vec[j].dia;
+			reg.mes=vec[j].mes;
+			reg.placa=vec[j].placa;
+			reg.estado=vec[j].estado;
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		fclose(ptr);
+	}
+}
